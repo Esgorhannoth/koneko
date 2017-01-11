@@ -1,0 +1,37 @@
+|17.0111.1215|
+. Integer - not bigint for now
+. Float - just to be there
+. String - whole on one line for now
+. Quote = [ word word word ]
+maybe
+. List = (elt elt elt) heterogenous (42 3.14 "string")
+
+main objectives:
+. InputStream (inst'ed via Lexer)
+. Lexer
+. Parser
+. Interpretation
+. Multi-line quotes definition ?
+  e.g.
+  > [ word word
+  |   word word word ]
+  ok
+  >
+. 'ok's ?
+
+
+
+OLD
+===
+. Interpreter (for now at least)
+. BigInt for integer ?
+. Float
+. Bool
+. String (interpolation??) - double quoted
+. List? Array? Map?
+. Quote == lambda (delayed execution) [ quote ]
+
+. Loops (for? while?)
+. Conditinos (if?)
+. vars? (def)
+. words? (def)
