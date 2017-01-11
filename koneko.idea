@@ -6,6 +6,13 @@
 maybe
 . List = (elt elt elt) heterogenous (42 3.14 "string")
 
+
+* words definition?
+  [ dup dup swap ] :word // ? , yeah `dup dup swap` is kinda joke
+
+* stack item has it's type as string for generic isOf(type: String) function
+
+
 main objectives:
 . InputStream (inst'ed via Lexer)
 . Lexer
