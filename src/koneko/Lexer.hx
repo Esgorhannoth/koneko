@@ -2,6 +2,8 @@ package koneko;
 
 import haxe.Utf8;
 
+using  koneko.Token;
+
 class Lexer {
   // Since InputStream.next() returns int codepoint
   // it's good to use "x".code to compare.
@@ -140,10 +142,10 @@ class Lexer {
       return SomeFloat(f);
 
     } else if( rx_defword.match(atom) ) {
-      return DefWord(atom.substr(1));
+      return DefAtom(atom.substr(1));
 
     } else if( rx_word.match(atom) ) {
-      return Word(atom);
+      return Atom(atom);
     }
 
     croak('Error parsing "${atom}"');
@@ -205,5 +207,37 @@ class Lexer {
     var lx = new Lexer(test_string);
     while( !lx.eof() )
       Sys.println(lx.next());
+
+    Sys.println("Test SomeInt equalty: true, false, false");
+    var ta = SomeInt(4);
+    var tb = SomeInt(4);
+    var tc = SomeInt(5);
+    Sys.println(Tokens.eq(ta, tb));
+    Sys.println(Tokens.eq(ta, tc));
+    Sys.println(Tokens.eq(tb, tc));
+
+    Sys.println("Test SomeFloat equalty: true, false, false");
+    ta = SomeFloat(4.0);
+    tb = SomeFloat(4.0);
+    tc = SomeFloat(5.0);
+    Sys.println(Tokens.eq(ta, tb));
+    Sys.println(Tokens.eq(ta, tc));
+    Sys.println(Tokens.eq(tb, tc));
+
+    Sys.println("Test SomeString equalty: true, false, false");
+    ta = SomeString("esko");
+    tb = SomeString("esko");
+    tc = SomeString("goes");
+    Sys.println(Tokens.eq(ta, tb));
+    Sys.println(Tokens.eq(ta, tc));
+    Sys.println(Tokens.eq(tb, tc));
+
+    Sys.println("Test LBracket equalty: true, false, false");
+    ta = LBracket;
+    tb = LBracket;
+    tc = RParen;
+    Sys.println(Tokens.eq(ta, tb));
+    Sys.println(Tokens.eq(ta, tc));
+    Sys.println(Tokens.eq(tb, tc));
   }
 }

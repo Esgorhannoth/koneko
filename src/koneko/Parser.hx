@@ -1,7 +1,44 @@
 package koneko;
 
+/**
+  Grammar:
+  Item : WORD | DEFWORD | Quote
+  Quote : '[' WORD+ ']'
+  DEFWORD : ':' WORD
+ **/
 class Parser {
 
+  public var level(default, null): Int; // level of depth for quotes:
+                                        // <0> [ <1> some word [ <2> more words ] ]
+  var input: Lexer;
+
+  public function new(input: String) {
+    this.level = 0;
+  }
+
+  public function parse(input: String) {
+    this.input = new Lexer(input);
+    var ast = new Array<StackItem>(); // ast... lol
+    while( !input.eof() ) {
+      var tok = input.peek();
+      switch( tok ) {
+        case SomeInt(i) : ast.push( IntSI(i) );
+        case SomeFloat(i) : ast.push( FloatSI(i) );
+        case SomeString(i) : ast.push( StringSI(i) );
+        case LBracket : input.croak("Not yet implemented");
+        case RBracket : input.croak("Not yet implemented");
+        case LParen | LBrace | RParen | RBrace : input.croak("Not yet implemented");
+      } // switch
+    } // while
+  }
+
+  function match(t: Token) {
+    var tok = input.peek()
+    if( Tokens.eq(t, tok) )
+      input.next();
+    else
+      croak('Token "${tok} found, but ${t} expected"');
+  }
 
 
   // TODO from lexer

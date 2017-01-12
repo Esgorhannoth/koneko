@@ -10,7 +10,8 @@ maybe
 * words definition?
   [ dup dup swap ] :word // ? , yeah `dup dup swap` is kinda joke
 
-* stack item has it's type as string for generic isOf(type: String) function
+x stack item has it's type as string for generic isOf(type: String) function
+  nope, is_a("Type") uses pattern matching to match with given type
 
 
 main objectives:
