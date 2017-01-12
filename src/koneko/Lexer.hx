@@ -62,7 +62,7 @@ class Lexer {
 
   // private helpers
   function read_next(): Token {
-    read_while(is_whitespace);
+    skip_whitespace();
     if( input.eof() ) return EOF;
     var ch = input.peek();
     /* No comments for now
@@ -73,10 +73,18 @@ class Lexer {
     */
     if( ch == '"'.code ) return read_string('"');
     if( ch == "'".code ) return read_string("'");
-    if( ch == "[".code ) return read_quote();
-    // if( ch == "[".code ) return read_string("]");
-    if( ch == "(".code ) return read_string(")");
-    if( ch == "{".code ) return read_string("}");
+
+    if( ch == "(".code ||
+        ch == "[".code ||
+        ch == "{".code ||
+        ch == ")".code ||
+        ch == "]".code ||
+        ch == "}".code )
+      skip_token();
+
+    if( ch == "(".code ) return LParen;
+    if( ch == "[".code ) return LBracket;
+    if( ch == "{".code ) return LBrace;
     if( ch == ")".code ) return RParen;
     if( ch == "]".code ) return RBracket;
     if( ch == "}".code ) return RBrace;
@@ -142,24 +150,6 @@ class Lexer {
     return None;
   }
 
-
-  function read_quote(): Token {
-    var inner = new Array<Token>();
-    skip_token(); // skip `[`
-    while(true) {
-      var tok = read_next();
-      switch( tok ) {
-        case RBracket:
-          skip_token();
-          return if( inner.length <= 0 ) None; else Quote(inner);
-        case EOF:
-          croak('Unclosed quote');
-          return None;
-        case _:
-          inner.push(tok);
-      }
-    }
-  }
 
   // Not working :(
   // function read_while <T> (pred: T -> Bool): String {
