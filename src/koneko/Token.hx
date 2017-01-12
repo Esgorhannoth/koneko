@@ -10,6 +10,11 @@ enum Token {
                             // and can't start with `:`
   Quote(a: Array<Token>);
 
+  // for tracking end of structs
+  RParen;    // `)`
+  RBracket;  // `]`
+  RBrace;    // `}`
+
   None;
   EOF;
 }
