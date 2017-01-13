@@ -1,6 +1,6 @@
 package koneko;
 
-using  koneko.StackItem; // for .type
+using  koneko.StackItem; // for .type and .toString
 
 /**
   All function return either a valuable StackItem or Noop;
@@ -15,13 +15,63 @@ class Builtins {
 
   // TODO Debug
   public static function show_stack(s: Stack): StackItem {
+    var sb = new StringBuf();
+    sb.add("<");
+    sb.add(s.length);
+    sb.add(">");
+    for( i in s ) {
+      sb.add(" ");
+      sb.add(i.toString());
+    }
+    sb.add(" ");
+    out(sb.toString());
+    return Noop;
+  }
+
+  public static function show_debug(s: Stack): StackItem {
     Sys.println(s.toString());
+    return Noop;
+  }
+
+  public static function print(s: Stack): StackItem {
+    check_underflow(s);
+    var el = s.pop();
+    out( 
+        switch( el ) {
+          case IntSI(i)     : Std.string(i);
+          case FloatSI(f)   : Std.string(f);
+          case StringSI(s)  : s;
+          case AtomSI(s)    : '<A:$s>';
+          case DefAtomSI(s) : '<D:$s>';
+          case QuoteSI(_)   : '<Quote>';
+          case BuiltinSI(_) : '<Builtin>';
+          case Noop         : '<Noop>';
+          case _            : '<Unknown>';
+        }
+    );
+    return Noop;
+  }
+
+  public static function pop_and_print(s: Stack): StackItem {
+    check_underflow(s);
+    out(s.pop().toString());
     return Noop;
   }
 
   public static function add(s: Stack): StackItem {
     s.push( math_add(s) );
     return Noop;
+  }
+
+
+
+
+  static function out(v: String) {
+    Sys.stdout().writeString(v);
+  }
+  static function check_underflow(s: Stack) {
+    if( s.is_empty() )
+      throw KonekoException.StackUnderflow;
   }
 
   static function math_add(s: Stack): StackItem {
@@ -86,5 +136,10 @@ class Builtins {
   }
   static function add_strings(f: String, g: String): StackItem {
     return StringSI(f+g);
+  }
+
+  static inline function consume(s: Stack, n: Int) {
+    for( i in 1 ... n )
+      s.pop();
   }
 }

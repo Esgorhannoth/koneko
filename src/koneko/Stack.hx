@@ -10,7 +10,10 @@ interface IStack {
   public function dup(): Stack;      // DUPs TOS, fluent
   public function swap(): Stack;     // Swaps TOS and NOS
 
+  public function is_empty(): Bool;   // if stack is empty
   public function clear(): Stack;    // Remove all elements, fluent
+
+  public function iterator(): StackIterator;
 }
 
 class Stack implements IStack {
@@ -67,11 +70,21 @@ class Stack implements IStack {
     return this;
   }
 
+  public inline function is_empty(): Bool // if stack is empty
+  {
+    return this.length <= 0;
+  }
+
   public function clear(): Stack    // Remove all elements, fluent
   {
     head   = null;
     length = 0;
     return this;
+  }
+
+  public function iterator(): StackIterator 
+  {
+    return new StackIterator(this);
   }
 
   public function toString() {
@@ -104,5 +117,22 @@ class Stack implements IStack {
 
     s.push(QuoteSI([IntSI(42),StringSI("Gollum")]));
     Sys.println(s);
+  }
+}
+
+class StackIterator {
+  var head: StackCell;
+  public function new(s: Stack) {
+    this.head = s.head;
+  }
+
+  public function hasNext(): Bool {
+    return (head == null) ? false : true;
+  }
+
+  public function next(): StackItem {
+    var tos = head.value;
+    head = head.next;
+    return tos;
   }
 }

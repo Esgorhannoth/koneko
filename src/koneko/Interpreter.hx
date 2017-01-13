@@ -29,7 +29,7 @@ class Interpreter {
       case AtomSI    (s) :
         var si = vocabulary.get(s);
         switch( si ) {
-          case Noop : Sys.println('No such word "${si}"');
+          case Noop : Sys.println('No such word "${s}"');
           case _    : eval_item(si, Eager);
         }
       case DefAtomSI (s) :  // TODO
@@ -64,9 +64,16 @@ class Interpreter {
   function init_builtins() {
     // vocabulary.add("show", BuiltinSI( Builtins.show_stack ));
     // vocabulary.add("dup", BuiltinSI( Builtins.dup ));
-    add_builtin("show", Builtins.show_stack);
     add_builtin("dup",  Builtins.dup);
     add_builtin("+",    Builtins.add);
+    add_builtin("echo",  Builtins.print);
+    add_builtin("print", Builtins.print);
+    add_builtin("puts",  Builtins.print);
+
+    // add_builtin("show", Builtins.show_stack);
+    add_builtin(".s", Builtins.show_stack);
+    add_builtin(".",  Builtins.pop_and_print);
+    add_builtin("show_stack", Builtins.show_debug);
   }
 
   inline function add_builtin(key: String, builtin: Stack->StackItem) {
@@ -77,7 +84,10 @@ class Interpreter {
   // for standalone testing
   public static function main() {
     var i = new Interpreter();
-    i.interpret("42 32 dup dup show 3 4 + show + show");
+    // i.interpret("42 32 dup dup show 3 4 + show + show");
+    i.interpret("'esko ' 'goes ' 'home' + + echo .s" );
+    i.stack.clear();
+    i.interpret("12 42 .s + '||' print .s");
     //Sys.println(i.stack);
   }
 }
