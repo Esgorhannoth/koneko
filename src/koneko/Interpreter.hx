@@ -73,7 +73,7 @@ class Interpreter {
     // add_builtin("show", Builtins.show_stack);
     add_builtin(".s", Builtins.show_stack);
     add_builtin(".",  Builtins.pop_and_print);
-    add_builtin("show_stack", Builtins.show_debug);
+    add_builtin("show-stack", Builtins.show_debug);
   }
 
   inline function add_builtin(key: String, builtin: Stack->StackItem) {
@@ -85,9 +85,9 @@ class Interpreter {
   public static function main() {
     var i = new Interpreter();
     // i.interpret("42 32 dup dup show 3 4 + show + show");
-    i.interpret("'esko ' 'goes ' 'home' + + echo .s" );
+    // i.interpret("'esko ' 'goes ' 'home' + + echo .s" );
     i.stack.clear();
-    i.interpret("12 42 .s + '||' print .s");
+    i.interpret("12 42 .s + '||' print .s show-stack");
     //Sys.println(i.stack);
   }
 }

@@ -21,6 +21,11 @@
 # -neko bin/st.n
 
 # Test Interpreter
+# -cp src
+# -main koneko.Interpreter
+# -neko bin/inter.n
+#
+# Test Main
 -cp src
--main koneko.Interpreter
--neko bin/inter.n
+-main koneko.Main
+-neko bin/koneko.n

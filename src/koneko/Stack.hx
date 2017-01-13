@@ -94,7 +94,7 @@ class Stack implements IStack {
       a.push( elt.value );
       elt = elt.next;
     }
-    return "[\n  // Top to bottom\n  " + a.join("\n  ") + "\n]";
+    return "\n[\n  // Top to bottom\n  " + a.join("\n  ") + "\n]";
   }
 
 

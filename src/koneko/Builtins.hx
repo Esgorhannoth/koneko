@@ -16,13 +16,14 @@ class Builtins {
   // TODO Debug
   public static function show_stack(s: Stack): StackItem {
     var sb = new StringBuf();
+    var a = new Array<String>();
     sb.add("<");
     sb.add(s.length);
-    sb.add(">");
+    sb.add("> ");
     for( i in s ) {
-      sb.add(" ");
-      sb.add(i.toString());
+      a.unshift(i.toString());
     }
+    sb.add( a.join(" ") );
     sb.add(" ");
     out(sb.toString());
     return Noop;
@@ -59,7 +60,13 @@ class Builtins {
   }
 
   public static function add(s: Stack): StackItem {
-    s.push( math_add(s) );
+    var r = math_add(s);
+    switch( r ) {
+      case Noop : return Noop;
+      case _    :
+        consume(s, 2);
+        s.push(r);
+    }
     return Noop;
   }
 
@@ -69,6 +76,7 @@ class Builtins {
   static function out(v: String) {
     Sys.stdout().writeString(v);
   }
+
   static function check_underflow(s: Stack) {
     if( s.is_empty() )
       throw KonekoException.StackUnderflow;
@@ -139,7 +147,7 @@ class Builtins {
   }
 
   static inline function consume(s: Stack, n: Int) {
-    for( i in 1 ... n )
+    for( i in 0 ... n )
       s.pop();
   }
 }
