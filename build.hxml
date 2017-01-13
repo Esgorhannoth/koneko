@@ -11,6 +11,11 @@
 # -neko bin/lx.n
 
 # Test Parser
+# -cp src
+# -main koneko.Parser
+# -neko bin/ps.n
+
+# Test Stack
 -cp src
--main koneko.Parser
--neko bin/ps.n
+-main koneko.Stack
+-neko bin/st.n

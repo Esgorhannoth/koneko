@@ -11,13 +11,15 @@ using  koneko.Token;
  **/
 class Parser {
 
+  /*
   public var level(default, null): Int; // level of depth for quotes:
                                         // <0> [ <1> some word [ <2> more words ] ]
+   */
   var input: Lexer;
 
   public function new(input: String) {
     this.input = new Lexer(input);
-    this.level = 0;
+    // this.level = 0;
   }
 
   public function parse(): Array<StackItem> {
