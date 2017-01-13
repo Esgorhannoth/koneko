@@ -1,14 +1,13 @@
 package koneko;
 
 enum Token {
-  SomeInt(i: Int);
-  SomeFloat(f: Float);
-  SomeString(s: String);
+  SomeInt    (i: Int);
+  SomeFloat  (f: Float);
+  SomeString (s: String);
 
-  DefAtom(w: String);       // Same as Atom, but starts with ":", e.g. :say-hello
-  Atom(w: String);          // Almost any char, except all parens `[]{}()`
+  DefAtom    (w: String);   // Same as Atom, but starts with ":", e.g. :say-hello
+  Atom       (w: String);   // Almost any char, except all parens `[]{}()`
                             // and can't start with `:`
-  // Quote(a: Array<Token>);
 
   LParen;    // `(`
   LBracket;  // `[`

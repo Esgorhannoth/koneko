@@ -1,9 +1,16 @@
 #! /usr/bin/env haxe
 
+# Test InputStream
 # -cp src
 # -main koneko.InputStream
 # -neko bin/is.n
 
+# Test Lexer
+# -cp src
+# -main koneko.Lexer
+# -neko bin/lx.n
+
+# Test Parser
 -cp src
--main koneko.Lexer
--neko bin/lx.n
+-main koneko.Parser
+-neko bin/ps.n
