@@ -1,5 +1,6 @@
 package koneko;
 
+using  StringTools;
 using  koneko.StackItem; // for .type and .toString
 
 /**
@@ -53,6 +54,17 @@ class Builtins {
     return Noop;
   }
 
+  public static function drop(s: Stack): StackItem {
+    assert_stack_has(s, 1);
+    return s.pop();
+  }
+
+  public static function swap(s: Stack): StackItem {
+    assert_stack_has(s, 2);
+    s.swap();
+    return Noop;
+  }
+
   public static function pop_and_print(s: Stack): StackItem {
     check_underflow(s);
     out(s.pop().toString());
@@ -70,15 +82,30 @@ class Builtins {
     return Noop;
   }
 
+  public static function quit(s: Stack): StackItem {
+    Sys.exit(0);
+    return Noop;
+  }
 
 
 
+
+  //
+  // private
+  //
   static function out(v: String) {
     Sys.stdout().writeString(v);
   }
 
   static function check_underflow(s: Stack) {
     if( s.is_empty() )
+      throw KonekoException.StackUnderflow;
+  }
+
+  static function assert_stack_has(s: Stack, n: Int) {
+    if( n < 1 )
+      throw KonekoException.WrongAssertionParam;
+    if( s.length < n )
       throw KonekoException.StackUnderflow;
   }
 

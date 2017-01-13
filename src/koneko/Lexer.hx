@@ -104,7 +104,17 @@ class Lexer {
     while( !input.eof() ) {
       var ch = input.next();
       if( escaped ) {
-        str.addChar(ch);
+        str.addChar(
+            switch( ch ) {
+              case "n".code  : "\n".code;
+              case "t".code  : "\t".code;
+              case "\\".code : "\\".code;
+              case "'".code  : "'".code;
+              case "\"".code : "\"".code;
+              case _         : ch;
+            }
+            );
+        // str.addChar(ch);
         escaped = false;
       } else if( ch == "\\".code ) {
         escaped = true;

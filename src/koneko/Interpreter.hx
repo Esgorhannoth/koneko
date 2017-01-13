@@ -75,7 +75,10 @@ class Interpreter {
     // vocabulary.add("show", BuiltinSI( Builtins.show_stack ));
     // vocabulary.add("dup", BuiltinSI( Builtins.dup ));
     add_builtin("dup",  Builtins.dup);
+    add_builtin("drop", Builtins.drop);
+    add_builtin("swap", Builtins.swap);
     add_builtin("+",    Builtins.add);
+
     add_builtin("echo",  Builtins.print);
     add_builtin("print", Builtins.print);
     add_builtin("puts",  Builtins.print);
@@ -84,6 +87,8 @@ class Interpreter {
     add_builtin(".s", Builtins.show_stack);
     add_builtin(".",  Builtins.pop_and_print);
     add_builtin("show-stack", Builtins.show_debug);
+
+    add_builtin("bye", Builtins.quit);
   }
 
   inline function add_builtin(key: String, builtin: Stack->StackItem) {

@@ -1,6 +1,6 @@
 package koneko;
 
-
+using  StringTools;
 using  koneko.StackItem;
 
 enum StackItem {
@@ -37,7 +37,8 @@ class StackItems {
       case Noop          : "Noop";
       case IntSI     (i) : Std.string(i);
       case FloatSI   (f) : Std.string(f);
-      case StringSI  (s) : '"${s}"';
+      // case StringSI  (s) : '"${s}"';
+      case StringSI  (s) : '"${s.replace("\\n","\\\\n").replace("\\t","\\\\t")}"';
       case AtomSI    (s) : '"${s}"';
       case DefAtomSI (s) : '":${s}"';
       case QuoteSI   (q) :
