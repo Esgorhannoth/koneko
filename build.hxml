@@ -16,6 +16,11 @@
 # -neko bin/ps.n
 
 # Test Stack
+# -cp src
+# -main koneko.Stack
+# -neko bin/st.n
+
+# Test Interpreter
 -cp src
--main koneko.Stack
--neko bin/st.n
+-main koneko.Interpreter
+-neko bin/inter.n

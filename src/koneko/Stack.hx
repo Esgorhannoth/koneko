@@ -49,6 +49,8 @@ class Stack implements IStack {
 
   public function dup(): Stack      // DUPs TOS, fluent
   {
+    if( length <= 0 )
+      throw KonekoException.StackUnderflow;
     head = new StackCell(head.value, head);
     length++;
     return this;
