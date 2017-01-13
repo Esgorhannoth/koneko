@@ -32,8 +32,18 @@ class Interpreter {
           case Noop : Sys.println('No such word "${s}"');
           case _    : eval_item(si, Eager);
         }
-      case DefAtomSI (s) :  // TODO
-      case QuoteSI   (q) :  // TODO
+      case DefAtomSI (s) : 
+        if( stack.is_empty() )
+          throw KonekoException.StackUnderflow;
+        // bind `s` to TOS
+        vocabulary.set(s, stack.pop());
+      case QuoteSI   (q) :
+        if( how == Lazy )
+          stack.push(item); // just push parsed quote to stack
+        else {
+          for( i in q )
+            eval_item(i);
+        }
       case BuiltinSI (f) : f(stack);
 
                            // not needed yet

@@ -126,7 +126,8 @@ class Builtins {
         case StringSI(s) : s;
         case _           : throw KonekoException.IncompatibleTypes;  // unreachable
       }
-      return add_strings(fst, snd);
+      return add_strings(snd, fst); // it's more logical concat NOS + TOS
+                                    // as they are added this way
     }
 
     throw KonekoException.IncompatibleTypes;
