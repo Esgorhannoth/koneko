@@ -22,7 +22,7 @@ class Lexer {
   static var rx_int = ~/^[0-9]+$/;
   static var rx_float = ~/^\d+\.\d*$/; // 3. is a valid float number, .3 is not
   // static var rx_float_exp = // not supported (for now?)
-  static var rx_defword = ~/^:[^][(){}\t\n\r \0]+$/i;
+  // static var rx_defword = ~/^:[^][(){}\t\n\r \0]+$/i;
   static var rx_word = ~/^[^][(){}\t\n\r \0]+$/;
 
   static var rx_rparen   = ~/^\)$/;
@@ -150,9 +150,6 @@ class Lexer {
       if( f == null )
         croak('Error parsing ${atom}');
       return SomeFloat(f);
-
-    } else if( rx_defword.match(atom) ) {
-      return DefAtom(atom.substr(1));
 
     } else if( rx_word.match(atom) ) {
       return Atom(atom);

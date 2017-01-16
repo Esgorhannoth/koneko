@@ -3,6 +3,7 @@ package koneko;
 enum EvalMode {
   Lazy;
   Eager;
+  Definition;
 }
 /**
   1. Parse line
@@ -15,48 +16,62 @@ class Interpreter {
   public var stack      (default, null): Stack;
   // public var parser     (default, null): Parser;
 
+
   public function new() {
     this.vocabulary = new Vocabulary();
     this.stack      = new Stack();
     init_builtins();
   }
 
-  public function eval_item(item: StackItem, ?how: EvalMode) {
+  public function eval_item(item: StackItem, ?how: EvalMode): EvalMode {
     if( how == null )
       how = Lazy;
     switch( item ) {
       case IntSI     (_) | FloatSI(_) | StringSI(_) : stack.push(item);
       case AtomSI    (s) :
+        if( how == Definition ) {
+          if( stack.is_empty() )
+            throw KonekoException.StackUnderflow;
+          else // bind `s` to TOS
+            vocabulary.set(s, stack.pop());
+          return Lazy;
+        }
         var si = vocabulary.get(s);
         switch( si ) {
-          case Noop : Sys.println('No such word "${s}"');
-          case _    : eval_item(si, Eager);
+          case Noop : say('No such word "${s}"');
+          case _    : return eval_item(si, Eager);
         }
-      case DefAtomSI (s) : 
-        if( stack.is_empty() )
-          throw KonekoException.StackUnderflow;
-        // bind `s` to TOS
-        vocabulary.set(s, stack.pop());
+      case DefAtomSI     : 
+        throw KonekoException.Custom("DefAtom in AST 0.o");
       case QuoteSI   (q) :
         if( how == Lazy )
           stack.push(item); // just push parsed quote to stack
-        else {
+        else { // Eager
           for( i in q )
-            eval_item(i);
+            eval_item(i); // Lazily
         }
-      case BuiltinSI (f) : f(stack);
+      case BuiltinSI (f) :
+        var si = f(stack);
+        return switch( si ) {
+          case DefAtomSI    : Definition;
+          case _            : Lazy;
+        }
+      case ErrSI     (e) :
+        say('\nERROR: $e');
+        stack.pop();
 
                            // not needed yet
-      case Noop: 
-      case PartQuoteSI(_):  // should not meet at all
-    }
+      case Noop          : 
+      case PartQuoteSI(_): // should not meet at all
+    } // switch
+    return Lazy;
   }
 
   public function eval(ast: Array<StackItem>, ?how: EvalMode) {
-    if( how == null )
-      how = Lazy;
+    var mode = ( how == null ) ? Lazy : how;
+    /// var mode = ( how == null ) ? Eager : how;
     for( el in ast ) {
-      eval_item(el, how);
+      mode = eval_item(el, mode);
     }
   }
 
@@ -66,14 +81,21 @@ class Interpreter {
       var ast = p.parse();
       eval(ast);
     } catch(e: Dynamic) {
-      Sys.println(e);
+      if( Std.is(e, KonekoException) ) {
+        out("ERROR: ");
+        say(switch( cast(e, KonekoException) ) {
+          case StackUnderflow      : "Stack Underflow";
+          case IncompatibleTypes   : "Incompatible Type(s)";
+          case WrongAssertionParam : "Debug: Wrong assertion parameter";
+          case Custom(s)           : s;
+        });
+      }
+      else
+        say(e);
     }
-
   }
 
   function init_builtins() {
-    // vocabulary.add("show", BuiltinSI( Builtins.show_stack ));
-    // vocabulary.add("dup", BuiltinSI( Builtins.dup ));
     add_builtin("dup",  Builtins.dup);
     add_builtin("drop", Builtins.drop);
     add_builtin("swap", Builtins.swap);
@@ -83,7 +105,9 @@ class Interpreter {
     add_builtin("print", Builtins.print);
     add_builtin("puts",  Builtins.print);
 
-    // add_builtin("show", Builtins.show_stack);
+    add_builtin("i",     Builtins.with_interp(this, Builtins.identity));
+    add_builtin(":",     Builtins.define);
+
     add_builtin(".s", Builtins.show_stack);
     add_builtin(".",  Builtins.pop_and_print);
     add_builtin("show-stack", Builtins.show_debug);
@@ -93,6 +117,16 @@ class Interpreter {
 
   inline function add_builtin(key: String, builtin: Stack->StackItem) {
     return vocabulary.add(key, BuiltinSI(builtin));
+  }
+
+
+  // helpers
+  static inline function out(v: Dynamic) {
+    Sys.print(v);
+  }
+
+  static inline function say(v: Dynamic) {
+    Sys.println(v);
   }
 
 

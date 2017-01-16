@@ -13,6 +13,46 @@ maybe
 x stack item has it's type as string for generic isOf(type: String) function
   nope, is_a("Type") uses pattern matching to match with given type
 
+|17.0116.0909|
+- Builtins.with_voc(Stack -> Vocabulary (Stack -> StackItem)) 
+  returns normal Builtins function Stack->StackItem, but with vocabulary set
+
+- stack:
+* [v] dup
+* [v] swap
+* [ ] rot
+* [ ] -rot
+* [v] drop
+* [ ] over
+
+- stack item:
+* [ ] type? : type e.g. !String, !Noop, !Int
+
+- math:
+* [v] add
+* [ ] sub
+* [ ] mult
+* [ ] idiv
+* [ ] fdiv
+* [ ] negate
+* [ ] round/ceil/floor
+* [ ] eq/neq/gt/ge/lt/le `NOS gt TOS`
+* [ ] and/or/xor/not ( 1 (any !=0) - true, 0 - false ) ( 0 not -> 1 )
+
+- strings:
+* [ ] at
+* [ ] upcase
+* [ ] downcase
+* [ ] reverse
+
+- structured
+* [ ] if: [true-br] [false-br] [cond] if
+* [ ] while ???
+
+- combinators?
+* [ ] `i` identity
+* [ ]`each`: `[el el] [func] each`
+
 
 main objectives:
 . InputStream (inst'ed via Lexer)

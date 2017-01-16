@@ -5,13 +5,15 @@ using  koneko.StackItem;
 
 enum StackItem {
   Noop;
+  DefAtomSI;    // mode switcher
   IntSI       (i: Int);
   FloatSI     (f: Float);
   StringSI    (s: String);
   AtomSI      (s: String);
-  DefAtomSI   (s: String);
   QuoteSI     (q: Array<StackItem>);
   BuiltinSI   (f: Stack -> StackItem); // built-in callable static function(Stack): StackItem
+
+  ErrSI       (e: String); // Operation resulted in error
 
   // not needed yet
   PartQuoteSI (p: Array<StackItem>); // Partial quote, e.g. in interpreted multiline quote
@@ -20,15 +22,16 @@ enum StackItem {
 class StackItems {
   public static function type(si: StackItem): String {
     return switch( si ) {
-      case Noop          : "Noop";
-      case IntSI     (_) : "Int";
-      case FloatSI   (_) : "Float";
-      case StringSI  (_) : "String";
-      case AtomSI    (_) : "Atom";
-      case DefAtomSI (_) : "DefAtom";
-      case QuoteSI   (_) : "Quote";
-      case BuiltinSI (_) : "Builtin";
-      case _             : "Unknown";
+      case Noop          : "!Noop";
+      case IntSI     (_) : "!Int";
+      case FloatSI   (_) : "!Float";
+      case StringSI  (_) : "!String";
+      case AtomSI    (_) : "!Atom";
+      case DefAtomSI     : "!DefAtom";
+      case QuoteSI   (_) : "!Quote";
+      case BuiltinSI (_) : "!Builtin";
+      case ErrSI     (_) : "!Error";
+      case _             : "!Unknown";
     }
   }
 
@@ -40,14 +43,15 @@ class StackItems {
       // case StringSI  (s) : '"${s}"';
       case StringSI  (s) : '"${s.replace("\\n","\\\\n").replace("\\t","\\\\t")}"';
       case AtomSI    (s) : '"${s}"';
-      case DefAtomSI (s) : '":${s}"';
+      case DefAtomSI     : '"<DefAtom>"';
       case QuoteSI   (q) :
         var a = new Array<String>();
         for ( i in q )
           a.push( i.toString() );
         "[" + a.join(" ") + "]";
-      case BuiltinSI (_) : "Builtin";
-      case _             : "Unknown";
+      case BuiltinSI (_) : "<Builtin>";
+      case ErrSI     (_) : "<Error>";
+      case _             : "<Unknown>";
     }
   }
 }

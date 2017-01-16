@@ -33,7 +33,7 @@ class Parser {
         case SomeString(s) : ast.push( read_string(s) );
         // atoms
         case Atom(s)       : ast.push( read_atom(s) );
-        case DefAtom(s)    : ast.push( read_defatom(s) );
+        // case DefAtom(s)    : ast.push( read_defatom(s) );
         // quotes
         case LBracket      : ast.push( read_quote() );
         case RBracket      : return ast;
@@ -53,7 +53,7 @@ class Parser {
   function read_float(f: Float)    : StackItem { input.next(); return FloatSI   (f); }
   function read_string(s: String)  : StackItem { input.next(); return StringSI  (s); }
   function read_atom(s: String)    : StackItem { input.next(); return AtomSI    (s); }
-  function read_defatom(s: String) : StackItem { input.next(); return DefAtomSI (s); }
+  // function read_defatom(s: String) : StackItem { input.next(); return DefAtomSI (s); }
 
   function read_quote(): StackItem {
     var quote = new Array<StackItem>();

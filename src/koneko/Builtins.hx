@@ -4,13 +4,92 @@ using  StringTools;
 using  koneko.StackItem; // for .type and .toString
 
 /**
-  All function return either a valuable StackItem or Noop;
+  All functions return either a valuable StackItem or Noop;
   If a function is not to return anything (side-effect only, like `dup`) it must return Noop;
   Otherwise the value returned can be used elsewhere;
  **/
 class Builtins {
+
+  // A-
+  public static function add(s: Stack): StackItem {
+    var r = math_add(s);
+    switch( r ) {
+      case Noop : return Noop;
+      case _    :
+        consume(s, 2);
+        s.push(r);
+    }
+    return Noop;
+  }
+
+  // D-
+  public static function define(s: Stack): StackItem {
+    check_underflow(s);
+    return DefAtomSI;
+  }
+  public static function drop(s: Stack): StackItem {
+    assert_stack_has(s, 1);
+    return s.pop();
+  }
+
   public static function dup(s: Stack): StackItem {
     s.dup();
+    return Noop;
+  }
+  
+  // I-
+  public static function identity(s: Stack, interp: Interpreter): StackItem {
+    check_underflow(s);
+    var item: StackItem = s.pop();
+    switch( item ) {
+      case QuoteSI   (q) : interp.eval(q, Eager);
+      case IntSI     (_) | FloatSI(_) | StringSI(_) : s.push(item);
+      case ErrSI     (e) : throw error(e);
+
+      case AtomSI    (s) : throw error('How did atom ${s} get here? 0.o');
+      case DefAtomSI     : throw error('How did defatom get here? 0.o');
+      case BuiltinSI (_) : throw error('How did builting get here? 0.o');
+      case Noop          : // do nothing
+      case PartQuoteSI(_): // should not meet at all
+    } // switch
+    return Noop;
+  }
+
+  // P-
+  public static function pop_and_print(s: Stack): StackItem {
+    check_underflow(s);
+    out(s.pop().toString());
+    return Noop;
+  }
+
+  public static function print(s: Stack): StackItem {
+    check_underflow(s);
+    var el = s.pop();
+    out( 
+        switch( el ) {
+          case IntSI(i)     : Std.string(i);
+          case FloatSI(f)   : Std.string(f);
+          case StringSI(s)  : s;
+          case AtomSI(s)    : '<A:$s>';
+          case DefAtomSI    : '<DefAtom>';
+          case QuoteSI(_)   : '<Quote>';
+          case BuiltinSI(_) : '<Builtin>';
+          case Noop         : '<Noop>';
+          case _            : '<Unknown>';
+        }
+    );
+    return Noop;
+  }
+
+  // Q-
+  public static function quit(s: Stack): StackItem {
+    Sys.exit(0);
+    return Noop;
+  }
+
+  // S-
+  public static function show_debug(s: Stack): StackItem {
+    say(s.toString());
     return Noop;
   }
 
@@ -30,60 +109,9 @@ class Builtins {
     return Noop;
   }
 
-  public static function show_debug(s: Stack): StackItem {
-    Sys.println(s.toString());
-    return Noop;
-  }
-
-  public static function print(s: Stack): StackItem {
-    check_underflow(s);
-    var el = s.pop();
-    out( 
-        switch( el ) {
-          case IntSI(i)     : Std.string(i);
-          case FloatSI(f)   : Std.string(f);
-          case StringSI(s)  : s;
-          case AtomSI(s)    : '<A:$s>';
-          case DefAtomSI(s) : '<D:$s>';
-          case QuoteSI(_)   : '<Quote>';
-          case BuiltinSI(_) : '<Builtin>';
-          case Noop         : '<Noop>';
-          case _            : '<Unknown>';
-        }
-    );
-    return Noop;
-  }
-
-  public static function drop(s: Stack): StackItem {
-    assert_stack_has(s, 1);
-    return s.pop();
-  }
-
   public static function swap(s: Stack): StackItem {
     assert_stack_has(s, 2);
     s.swap();
-    return Noop;
-  }
-
-  public static function pop_and_print(s: Stack): StackItem {
-    check_underflow(s);
-    out(s.pop().toString());
-    return Noop;
-  }
-
-  public static function add(s: Stack): StackItem {
-    var r = math_add(s);
-    switch( r ) {
-      case Noop : return Noop;
-      case _    :
-        consume(s, 2);
-        s.push(r);
-    }
-    return Noop;
-  }
-
-  public static function quit(s: Stack): StackItem {
-    Sys.exit(0);
     return Noop;
   }
 
@@ -93,13 +121,21 @@ class Builtins {
   //
   // private
   //
-  static function out(v: String) {
-    Sys.stdout().writeString(v);
+  static inline function out(v: Dynamic) {
+    Sys.print(v);
+  }
+
+  static inline function say(v: Dynamic) {
+    Sys.println(v);
   }
 
   static function check_underflow(s: Stack) {
     if( s.is_empty() )
       throw KonekoException.StackUnderflow;
+  }
+
+  static inline function error(s: String): KonekoException {
+    return KonekoException.Custom(s);
   }
 
   static function assert_stack_has(s: Stack, n: Int) {
@@ -116,7 +152,7 @@ class Builtins {
     var nos_type = nos.type();
 
     // Both Int
-    if( tos_type == "Int" && nos_type == "Int" ) {
+    if( tos_type == "!Int" && nos_type == "!Int" ) {
       var fst = switch( tos ) {
         case IntSI(i) : i;
         case _        : throw KonekoException.IncompatibleTypes;  // unreachable
@@ -129,7 +165,7 @@ class Builtins {
     }
 
     // One or both are Float
-    if( tos_type == "Float" || nos_type == "Float" ) {
+    if( tos_type == "!Float" || nos_type == "!Float" ) {
       var fst = switch( tos ) {
         case IntSI(i)   : cast(i, Float);
         case FloatSI(f) : f;
@@ -144,7 +180,7 @@ class Builtins {
     }
 
     // Both strings
-    if( tos_type == "String" && nos_type == "String" ) {
+    if( tos_type == "!String" && nos_type == "!String" ) {
       var fst = switch( tos ) {
         case StringSI(s) : s;
         case _           : throw KonekoException.IncompatibleTypes;  // unreachable
@@ -177,5 +213,21 @@ class Builtins {
   static inline function consume(s: Stack, n: Int) {
     for( i in 0 ... n )
       s.pop();
+  }
+
+  /**
+    Converts functions of type `Stack -> Vocabulary -> StackItem`
+    to `Stack -> StackItem`
+   **/
+  public static function with_voc(voc: Vocabulary, func: Stack -> Vocabulary -> StackItem) {
+    return function(s: Stack): StackItem {
+      return func(s, voc);
+    }
+  }
+
+  public static function with_interp(interp: Interpreter, func: Stack -> Interpreter  -> StackItem) {
+    return function(s: Stack): StackItem {
+      return func(s, interp);
+    }
   }
 }

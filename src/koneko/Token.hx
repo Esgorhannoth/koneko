@@ -5,7 +5,7 @@ enum Token {
   SomeFloat  (f: Float);
   SomeString (s: String);
 
-  DefAtom    (w: String);   // Same as Atom, but starts with ":", e.g. :say-hello
+  // DefAtom    (w: String);   // Same as Atom, but starts with ":", e.g. :say-hello
   Atom       (w: String);   // Almost any char, except all parens `[]{}()`
                             // and can't start with `:`
 
@@ -26,7 +26,7 @@ class Tokens {
       case SomeInt(_)    : "Int";
       case SomeFloat(_)  : "Float";
       case SomeString(_) : "String";
-      case DefAtom(_)    : "DefAtom";
+      // case DefAtom(_)    : "DefAtom";
       case Atom(_)       : "Atom";
       case LParen        : "LParen";
       case LBracket      : "LBracket";
@@ -64,11 +64,13 @@ class Tokens {
           case SomeString(sb) : s == sb;
           case _              : false;
         }
+      /*
       case DefAtom(s)    :
         switch( b ) {
           case DefAtom(sb) : s == sb;
           case _           : false;
         }
+       */
       case Atom(s)       :
         switch( b ) {
           case Atom(sb) : s == sb;
