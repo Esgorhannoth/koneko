@@ -22,6 +22,12 @@ class Builtins {
     return Noop;
   }
 
+  // C-
+  public static function clear_stack(s: Stack): StackItem {
+    s.clear();
+    return Noop;
+  }
+
   // D-
   public static function define(s: Stack): StackItem {
     check_underflow(s);
@@ -52,6 +58,18 @@ class Builtins {
       case Noop          : // do nothing
       case PartQuoteSI(_): // should not meet at all
     } // switch
+    return Noop;
+  }
+
+  // N-
+  public static function negate(s: Stack): StackItem {
+    check_underflow(s);
+    var item = s.pop();
+    switch( item ) {
+      case IntSI(i)   : s.push( IntSI( -i ) );
+      case FloatSI(f) : s.push( FloatSI( -f ) );
+      case _          : throw KonekoException.IncompatibleTypes;
+    }
     return Noop;
   }
 

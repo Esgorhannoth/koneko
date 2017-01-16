@@ -103,6 +103,7 @@ class Interpreter {
     add_builtin("pick", Builtins.pick);
     add_builtin("rot",  Builtins.rotate_3to1);
     add_builtin("-rot",  Builtins.rotate_1to3);
+    add_builtin("clear-stack", Builtins.clear_stack);
 
     add_builtin("type?", Builtins.type);
 
