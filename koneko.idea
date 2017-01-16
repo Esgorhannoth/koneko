@@ -20,13 +20,14 @@ x stack item has it's type as string for generic isOf(type: String) function
 - stack:
 * [v] dup
 * [v] swap
-* [ ] rot
-* [ ] -rot
+* [v] rot
+* [v] -rot
 * [v] drop
-* [ ] over
+* [v] over
+* [v] pick
 
 - stack item:
-* [ ] type? : type e.g. !String, !Noop, !Int
+* [v] type? : type e.g. !String, !Noop, !Int
 
 - math:
 * [v] add
@@ -34,7 +35,7 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [ ] mult
 * [ ] idiv
 * [ ] fdiv
-* [ ] negate
+* [v] negate
 * [ ] round/ceil/floor
 * [ ] eq/neq/gt/ge/lt/le `NOS gt TOS`
 * [ ] and/or/xor/not ( 1 (any !=0) - true, 0 - false ) ( 0 not -> 1 )

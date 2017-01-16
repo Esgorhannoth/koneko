@@ -18,7 +18,8 @@ interface IStack {
 
 class Stack implements IStack {
 
-  public var head  (default, null): StackCell;
+  // public var head  (default, default): StackCell;
+  public var head                 : StackCell;
   public var length(default, null): Int;
 
   public function new() {

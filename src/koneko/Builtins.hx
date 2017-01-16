@@ -55,7 +55,25 @@ class Builtins {
     return Noop;
   }
 
+  // O-
+  public static function over(s: Stack): StackItem {
+    assert_stack_has(s, 2);
+    s.push( s.nos() );
+    return Noop;
+  }
+
   // P-
+  public static function pick(s: Stack): StackItem {
+    check_underflow(s);
+    var item = s.pop();
+    var idx = switch( item ) {
+      case IntSI(i) : i;
+      case _        : throw KonekoException.Custom('Incompatible index type : ${item.type()}');
+    }
+    s.push( nth(s, idx).value );
+    return Noop;
+  }
+
   public static function pop_and_print(s: Stack): StackItem {
     check_underflow(s);
     out(s.pop().toString());
@@ -87,6 +105,48 @@ class Builtins {
     return Noop;
   }
 
+  public static function quit_with(s: Stack): StackItem {
+    var code = 0; // default
+    try {
+      check_underflow(s);
+      var item = s.pop();
+      code = switch( item ) {
+        case IntSI(i) : i;
+        case _        :
+          throw KonekoException.Custom('Exit code must be !Int, got ${item.type()}');
+          255;
+      }
+    } catch(e: Dynamic) {
+      code = 255;
+    }
+    Sys.exit(code);
+    return Noop;
+  }
+
+  // R-
+
+  // -rot : 1 2 3 -> 3 1 2
+  public static function rotate_1to3(s: Stack): StackItem {
+    var tmp: StackCell = nth(s, 0); // save TOS
+    var nos: StackCell = nth(s, 1);
+    var trd: StackCell = nth(s, 2);
+    s.head = nos;          // make NOS new TOS
+    tmp.next = trd.next;   // make old TOS point to trd's next
+    trd.next = tmp;        // make trd point to old TOS
+    return Noop;
+  }
+
+  // rot : 1 2 3 -> 2 3 1
+  public static function rotate_3to1(s: Stack): StackItem {
+    var tos: StackCell = nth(s, 0); // save TOS
+    var nos: StackCell = nth(s, 1);
+    var trd: StackCell = nth(s, 2);
+    s.head = trd;          // make TRD new TOS
+    nos.next = trd.next;   // make NOS point to TRD's next
+    trd.next = tos;        // make new TOS point to old TOS
+    return Noop;
+  }
+
   // S-
   public static function show_debug(s: Stack): StackItem {
     say(s.toString());
@@ -104,7 +164,7 @@ class Builtins {
       a.unshift(i.toString());
     }
     sb.add( a.join(" ") );
-    sb.add(" ");
+    sb.add("\n");
     out(sb.toString());
     return Noop;
   }
@@ -112,6 +172,14 @@ class Builtins {
   public static function swap(s: Stack): StackItem {
     assert_stack_has(s, 2);
     s.swap();
+    return Noop;
+  }
+
+  // T-
+  public static function type(s: Stack): StackItem {
+    check_underflow(s);
+    var item = s.pop();
+    s.push( StringSI( item.type() ) );
     return Noop;
   }
 
@@ -144,6 +212,21 @@ class Builtins {
     if( s.length < n )
       throw KonekoException.StackUnderflow;
   }
+
+  static inline function _3rd(s: Stack): StackCell {
+    return s.head.next.next;
+  }
+
+  // 0-based
+  static function nth(s: Stack, n: Int): StackCell {
+    assert_stack_has(s, n+1);
+    var cell = s.head;
+    while( n-- > 0 ) {
+      cell = cell.next;
+    } 
+    return cell;
+  }
+
 
   static function math_add(s: Stack): StackItem {
     var tos = s.tos();

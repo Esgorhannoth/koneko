@@ -99,7 +99,15 @@ class Interpreter {
     add_builtin("dup",  Builtins.dup);
     add_builtin("drop", Builtins.drop);
     add_builtin("swap", Builtins.swap);
-    add_builtin("+",    Builtins.add);
+    add_builtin("over", Builtins.over);
+    add_builtin("pick", Builtins.pick);
+    add_builtin("rot",  Builtins.rotate_3to1);
+    add_builtin("-rot",  Builtins.rotate_1to3);
+
+    add_builtin("type?", Builtins.type);
+
+    add_builtin("+",      Builtins.add);
+    add_builtin("negate", Builtins.negate);
 
     add_builtin("echo",  Builtins.print);
     add_builtin("print", Builtins.print);
@@ -112,6 +120,7 @@ class Interpreter {
     add_builtin(".",  Builtins.pop_and_print);
     add_builtin("show-stack", Builtins.show_debug);
 
+    add_builtin("quit/with", Builtins.quit_with);
     add_builtin("bye", Builtins.quit);
   }
 
