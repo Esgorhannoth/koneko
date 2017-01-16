@@ -14,7 +14,6 @@ class Interpreter {
 
   public var vocabulary (default, null): Vocabulary;
   public var stack      (default, null): Stack;
-  // public var parser     (default, null): Parser;
 
 
   public function new() {
@@ -22,6 +21,7 @@ class Interpreter {
     this.stack      = new Stack();
     init_builtins();
   }
+
 
   public function eval_item(item: StackItem, ?how: EvalMode): EvalMode {
     if( how == null )
@@ -69,7 +69,6 @@ class Interpreter {
 
   public function eval(ast: Array<StackItem>, ?how: EvalMode) {
     var mode = ( how == null ) ? Lazy : how;
-    /// var mode = ( how == null ) ? Eager : how;
     for( el in ast ) {
       mode = eval_item(el, mode);
     }
@@ -114,6 +113,8 @@ class Interpreter {
 
     add_builtin("random", Builtins.math_random);
     add_builtin("rnd",    Builtins.math_rnd);
+
+    add_builtin("sleep",  Builtins.sleep);
 
     add_builtin("echo",  Builtins.print);
     add_builtin("print", Builtins.print);

@@ -210,6 +210,15 @@ class Builtins {
     return Noop;
   }
 
+  public static function sleep(s: Stack): StackItem {
+    check_underflow(s);
+    switch( s.pop() ) {
+      case IntSI(i) : Sys.sleep(i);
+      case _        : throw KonekoException.IncompatibleTypes;
+    }
+    return Noop;
+  }
+
   public static function subtract(s: Stack): StackItem {
     assert_stack_has(s, 2);
     var r = math_subtract(s);

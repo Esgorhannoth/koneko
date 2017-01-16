@@ -63,6 +63,17 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [ ] BigInt much later
 
 
+|17.0116.1546|
+* [ ] Vocabulary: change to Map<String, StackItem>
+* [ ] on definition, make quotes eval atoms to definitions (mainly for builtins), so that
+      [print "\n" print] : say -> quote(builtin, string, builtin)
+
+* [ ] "string" ns - set current namespace
+  ns? - put on stack current namespace
+  default is "Main"
+  Vocabulary entries are : "<ns>:<word>"
+
+
 main objectives:
 . InputStream (inst'ed via Lexer)
 . Lexer
