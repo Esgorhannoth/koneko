@@ -53,8 +53,8 @@ x stack item has it's type as string for generic isOf(type: String) function
 
 - structured
 * [v] if: [true-br] [false-br] [cond] if
-* [ ] when: [true-br] [cond] when
-* [ ] while ???
+* [v] when: [true-br] [cond] when
+* [ ] [ words cond|int ] while - loop while TOS after execution is not zero
 
 - combinators?
 * [ ] `i` identity

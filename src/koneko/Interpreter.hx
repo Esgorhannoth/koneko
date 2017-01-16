@@ -125,6 +125,7 @@ class Interpreter {
     add_builtin("i",     Builtins.with_interp(this, Builtins.identity));
     add_builtin("if",    Builtins.with_interp(this, Builtins.if_conditional));
     add_builtin("when",  Builtins.with_interp(this, Builtins.when_conditional));
+    add_builtin("while", Builtins.with_interp(this, Builtins.while_loop));
     add_builtin(":",     Builtins.define);
 
     add_builtin(".s", Builtins.show_stack);

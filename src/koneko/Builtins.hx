@@ -279,6 +279,22 @@ class Builtins {
     return Noop;
   }
 
+  public static function while_loop(s: Stack, interp: Interpreter): StackItem {
+    assert_stack_has(s, 1);
+    var body = s.pop();
+    assert_is(body, "!Quote");
+    do {
+      interp.eval_item(body, Eager);
+      var r = s.pop();
+      switch( r ) {
+        case IntSI(i) : if( i == 0 ) break;
+        case _        : throw KonekoException.Custom(
+           'Condition for WHILE should leave !Int value on the stack. Found ${r.type()}');
+      }
+    } while(true);
+    return Noop;
+  }
+
 
 
 
