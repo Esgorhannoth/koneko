@@ -108,6 +108,8 @@ class Interpreter {
     add_builtin("type?", Builtins.type);
 
     add_builtin("+",      Builtins.add);
+    add_builtin("-",      Builtins.subtract);
+    add_builtin("*",      Builtins.multiply);
     add_builtin("negate", Builtins.negate);
 
     add_builtin("echo",  Builtins.print);

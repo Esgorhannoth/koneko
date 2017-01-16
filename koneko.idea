@@ -25,6 +25,9 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] drop
 * [v] over
 * [v] pick
+* [ ] 2dup
+* [ ] 2swap
+* [ ] 2over
 
 - stack item:
 * [v] type? : type e.g. !String, !Noop, !Int

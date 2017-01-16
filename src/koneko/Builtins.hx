@@ -12,11 +12,11 @@ class Builtins {
 
   // A-
   public static function add(s: Stack): StackItem {
+    assert_stack_has(s, 2);
     var r = math_add(s);
     switch( r ) {
       case Noop : return Noop;
       case _    :
-        consume(s, 2);
         s.push(r);
     }
     return Noop;
@@ -58,6 +58,18 @@ class Builtins {
       case Noop          : // do nothing
       case PartQuoteSI(_): // should not meet at all
     } // switch
+    return Noop;
+  }
+
+  // M-
+  public static function multiply(s: Stack): StackItem {
+    assert_stack_has(s, 2);
+    var r = math_multiply(s);
+    switch( r ) {
+      case Noop : return Noop;
+      case _    :
+        s.push(r);
+    }
     return Noop;
   }
 
@@ -187,6 +199,17 @@ class Builtins {
     return Noop;
   }
 
+  public static function subtract(s: Stack): StackItem {
+    assert_stack_has(s, 2);
+    var r = math_subtract(s);
+    switch( r ) {
+      case Noop : return Noop;
+      case _    :
+        s.push(r);
+    }
+    return Noop;
+  }
+
   public static function swap(s: Stack): StackItem {
     assert_stack_has(s, 2);
     s.swap();
@@ -247,49 +270,29 @@ class Builtins {
 
 
   static function math_add(s: Stack): StackItem {
-    var tos = s.tos();
-    var nos = s.nos();
+    var tos = s.pop();
+    var nos = s.pop();
     var tos_type = tos.type();
     var nos_type = nos.type();
 
     // Both Int
     if( tos_type == "!Int" && nos_type == "!Int" ) {
-      var fst = switch( tos ) {
-        case IntSI(i) : i;
-        case _        : throw KonekoException.IncompatibleTypes;  // unreachable
-      }
-      var snd = switch( nos ) {
-        case IntSI(i) : i;
-        case _        : throw KonekoException.IncompatibleTypes;  // unreachable
-      }
+      var fst = unwrap_int( tos );
+      var snd = unwrap_int( nos );
       return add_int_int(fst, snd);
     }
 
     // One or both are Float
     if( tos_type == "!Float" || nos_type == "!Float" ) {
-      var fst = switch( tos ) {
-        case IntSI(i)   : cast(i, Float);
-        case FloatSI(f) : f;
-        case _          : throw KonekoException.IncompatibleTypes;  // unreachable
-      }
-      var snd = switch( nos ) {
-        case IntSI(i)   : cast(i, Float);
-        case FloatSI(f) : f;
-        case _          : throw KonekoException.IncompatibleTypes;  // unreachable
-      }
+      var fst = unwrap_float( tos );
+      var snd = unwrap_float( nos );
       return add_float_float(fst, snd);
     }
 
     // Both strings
     if( tos_type == "!String" && nos_type == "!String" ) {
-      var fst = switch( tos ) {
-        case StringSI(s) : s;
-        case _           : throw KonekoException.IncompatibleTypes;  // unreachable
-      }
-      var snd = switch( nos ) {
-        case StringSI(s) : s;
-        case _           : throw KonekoException.IncompatibleTypes;  // unreachable
-      }
+      var fst = unwrap_string( tos );
+      var snd = unwrap_string( nos );
       return add_strings(snd, fst); // it's more logical concat NOS + TOS
                                     // as they are added this way
     }
@@ -298,6 +301,45 @@ class Builtins {
     return Noop; // should be unreachable
   }
 
+  static function math_subtract(s: Stack): StackItem {
+    var tos = s.pop();
+    var nos = s.pop();
+
+    // Both Int
+    if( tos.type() == "!Int" && nos.type() == "!Int" ) {
+      var fst = unwrap_int( tos );
+      var snd = unwrap_int( nos );
+      return subtract_int_int(snd, fst); // TOS from NOS
+    }
+
+    // Try to get floats
+    var fst = unwrap_float( tos );
+    var snd = unwrap_float( nos );
+    return subtract_float_float(snd, fst); // TOS from NOS
+
+    return Noop; // should be unreachable
+  }
+
+  static function math_multiply(s: Stack): StackItem {
+    var tos = s.pop();
+    var nos = s.pop();
+
+    // Both Int
+    if( tos.type() == "!Int" && nos.type() == "!Int" ) {
+      var fst = unwrap_int( tos );
+      var snd = unwrap_int( nos );
+      return multiply_int_int(snd, fst);
+    }
+
+    // Try to get floats
+    var fst = unwrap_float( tos );
+    var snd = unwrap_float( nos );
+    return multiply_float_float(snd, fst);
+
+    return Noop; // should be unreachable
+  }
+
+  // add
   static function add_int_int(i: Int, j: Int): StackItem {
     return IntSI(i+j);
   }
@@ -310,10 +352,51 @@ class Builtins {
   static function add_strings(f: String, g: String): StackItem {
     return StringSI(f+g);
   }
+  // sub
+  static function subtract_int_int(i: Int, j: Int): StackItem {
+    return IntSI(i-j);
+  }
+
+  static function subtract_float_float(f: Float, g: Float): StackItem {
+    return FloatSI(f-g);
+  }
+
+  // mult
+  static function multiply_int_int(i: Int, j: Int): StackItem {
+    return IntSI(i*j);
+  }
+
+  static function multiply_float_float(f: Float, g: Float): StackItem {
+    return FloatSI(f*g);
+  }
+
+
 
   static inline function consume(s: Stack, n: Int) {
     for( i in 0 ... n )
       s.pop();
+  }
+
+  static inline function unwrap_int(si: StackItem): Int {
+    return switch( si ) {
+      case IntSI(i): i;
+      case _ : throw KonekoException.IncompatibleTypes;
+    }
+  }
+
+  static inline function unwrap_float(si: StackItem): Float {
+    return switch( si ) {
+      case IntSI(i)  : cast(i, Float);
+      case FloatSI(f): f;
+      case _ : throw KonekoException.IncompatibleTypes;
+    }
+  }
+
+  static inline function unwrap_string(si: StackItem): String {
+    return switch( si ) {
+      case StringSI(s): s;
+      case _ : throw KonekoException.IncompatibleTypes;
+    }
   }
 
   /**
