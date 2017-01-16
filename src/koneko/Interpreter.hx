@@ -86,6 +86,7 @@ class Interpreter {
           case StackUnderflow      : "Stack Underflow";
           case IncompatibleTypes   : "Incompatible Type(s)";
           case WrongAssertionParam : "Debug: Wrong assertion parameter";
+          case AssertFailureWrongType(s) : 'Wrong Type ${s}';
           case Custom(s)           : s;
         });
       }
@@ -106,6 +107,7 @@ class Interpreter {
 
     add_builtin("type?", Builtins.type);
 
+
     add_builtin("+",      Builtins.add);
     add_builtin("-",      Builtins.subtract);
     add_builtin("*",      Builtins.multiply);
@@ -121,6 +123,8 @@ class Interpreter {
     add_builtin("puts",  Builtins.print);
 
     add_builtin("i",     Builtins.with_interp(this, Builtins.identity));
+    add_builtin("if",    Builtins.with_interp(this, Builtins.if_conditional));
+    add_builtin("when",  Builtins.with_interp(this, Builtins.when_conditional));
     add_builtin(":",     Builtins.define);
 
     add_builtin(".s", Builtins.show_stack);

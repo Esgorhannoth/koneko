@@ -61,6 +61,24 @@ class Builtins {
     return Noop;
   }
 
+  public static function if_conditional(s: Stack, interp: Interpreter): StackItem {
+    assert_stack_has(s, 3);
+    var cond = s.pop();
+    var else_br = s.pop();
+    var then_br = s.pop();
+    assert_is(else_br, "!Quote");
+    assert_is(then_br, "!Quote");
+    interp.eval_item(cond, Eager);
+    var r = s.pop(); // supposedly from evaluation of `cond`
+    switch( r ) {
+      case IntSI(i) :
+        if( i == 0 ) interp.eval_item(else_br, Eager) else interp.eval_item(then_br, Eager);
+      case _        :
+        throw KonekoException.Custom('Condition for IF should leave !Int value on the stack. Found ${r.type()}');
+    }
+    return Noop;
+  }
+
   // M-
   public static function math_random(s: Stack): StackItem {
     check_underflow(s);
@@ -244,6 +262,23 @@ class Builtins {
     return Noop;
   }
 
+  // W-
+  public static function when_conditional(s: Stack, interp: Interpreter): StackItem {
+    assert_stack_has(s, 2);
+    var cond = s.pop();
+    var then_br = s.pop();
+    assert_is(then_br, "!Quote");
+    interp.eval_item(cond, Eager);
+    var r = s.pop(); // supposedly from evaluation of `cond`
+    switch( r ) {
+      case IntSI(i) :
+        if( i != 0 ) interp.eval_item(then_br, Eager);
+      case _        :
+        throw KonekoException.Custom('Condition for WHEN should leave !Int value on the stack. Found ${r.type()}');
+    }
+    return Noop;
+  }
+
 
 
 
@@ -272,6 +307,11 @@ class Builtins {
       throw KonekoException.WrongAssertionParam;
     if( s.length < n )
       throw KonekoException.StackUnderflow;
+  }
+
+  static inline function assert_is(si: StackItem, type: String) {
+    if( si.type() != type )
+      throw KonekoException.AssertFailureWrongType(si.type());
   }
 
   static inline function _3rd(s: Stack): StackCell {

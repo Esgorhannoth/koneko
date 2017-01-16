@@ -52,7 +52,8 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [ ] reverse
 
 - structured
-* [ ] if: [true-br] [false-br] [cond] if
+* [v] if: [true-br] [false-br] [cond] if
+* [ ] when: [true-br] [cond] when
 * [ ] while ???
 
 - combinators?
