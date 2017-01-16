@@ -74,7 +74,7 @@ class Builtins {
       case IntSI(i) :
         if( i == 0 ) interp.eval_item(else_br, Eager) else interp.eval_item(then_br, Eager);
       case _        :
-        throw KonekoException.Custom('Condition for IF should leave !Int value on the stack. Found ${r.type()}');
+        throw error('Condition for IF should leave !Int value on the stack. Found ${r.type()}');
     }
     return Noop;
   }
@@ -128,7 +128,7 @@ class Builtins {
     var item = s.pop();
     var idx = switch( item ) {
       case IntSI(i) : i;
-      case _        : throw KonekoException.Custom('Incompatible index type : ${item.type()}');
+      case _        : throw error('Incompatible index type : ${item.type()}');
     }
     s.push( nth(s, idx).value );
     return Noop;
@@ -173,7 +173,7 @@ class Builtins {
       code = switch( item ) {
         case IntSI(i) : i;
         case _        :
-          throw KonekoException.Custom('Exit code must be !Int, got ${item.type()}');
+          throw error('Exit code must be !Int, got ${item.type()}');
           255;
       }
     } catch(e: Dynamic) {
@@ -274,7 +274,7 @@ class Builtins {
       case IntSI(i) :
         if( i != 0 ) interp.eval_item(then_br, Eager);
       case _        :
-        throw KonekoException.Custom('Condition for WHEN should leave !Int value on the stack. Found ${r.type()}');
+        throw error('Condition for WHEN should leave !Int value on the stack. Found ${r.type()}');
     }
     return Noop;
   }
@@ -288,7 +288,7 @@ class Builtins {
       var r = s.pop();
       switch( r ) {
         case IntSI(i) : if( i == 0 ) break;
-        case _        : throw KonekoException.Custom(
+        case _        : throw error(
            'Condition for WHILE should leave !Int value on the stack. Found ${r.type()}');
       }
     } while(true);

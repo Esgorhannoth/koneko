@@ -47,8 +47,7 @@ class Interpreter {
         if( how == Lazy )
           stack.push(item); // just push parsed quote to stack
         else { // Eager
-          for( i in q )
-            eval_item(i); // Lazily
+          eval(q);
         }
       case BuiltinSI (f) :
         var si = f(stack);
