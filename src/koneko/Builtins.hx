@@ -62,6 +62,18 @@ class Builtins {
   }
 
   // M-
+  public static function math_random(s: Stack): StackItem {
+    check_underflow(s);
+    var item = s.pop();
+    s.push( IntSI( Std.random( unwrap_int(item) )));
+    return Noop;
+  }
+
+  public static function math_rnd(s: Stack): StackItem {
+    s.push( FloatSI( Math.random() ) );
+    return Noop;
+  }
+
   public static function multiply(s: Stack): StackItem {
     assert_stack_has(s, 2);
     var r = math_multiply(s);
@@ -154,7 +166,6 @@ class Builtins {
   }
 
   // R-
-
   // -rot : 1 2 3 -> 3 1 2
   public static function rotate_1to3(s: Stack): StackItem {
     var tmp: StackCell = nth(s, 0); // save TOS
@@ -369,6 +380,8 @@ class Builtins {
   static function multiply_float_float(f: Float, g: Float): StackItem {
     return FloatSI(f*g);
   }
+
+  // div mod
 
 
 

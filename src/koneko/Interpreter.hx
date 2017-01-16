@@ -112,6 +112,9 @@ class Interpreter {
     add_builtin("*",      Builtins.multiply);
     add_builtin("negate", Builtins.negate);
 
+    add_builtin("random", Builtins.math_random);
+    add_builtin("rnd",    Builtins.math_rnd);
+
     add_builtin("echo",  Builtins.print);
     add_builtin("print", Builtins.print);
     add_builtin("puts",  Builtins.print);
