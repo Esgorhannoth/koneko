@@ -130,6 +130,7 @@ class Interpreter {
 
     add_builtin(".s", Builtins.show_stack);
     add_builtin(".",  Builtins.pop_and_print);
+    add_builtin("words", Builtins.with_voc(vocabulary, Builtins.words_list));
     add_builtin("show-stack", Builtins.show_debug);
 
     add_builtin("quit/with", Builtins.quit_with);

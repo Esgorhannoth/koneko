@@ -295,6 +295,20 @@ class Builtins {
     return Noop;
   }
 
+  public static function words_list(s: Stack, voc: Vocabulary): StackItem {
+    var words = new Array<String>();
+    for (i in voc.keys()) {
+      words.push(i);
+    }
+    words.sort(function(s1: String, s2: String): Int {
+      if( s1 == s2 ) return 0;
+      else if( s1 > s2 ) return 1;
+      else return -1;
+    });
+    say(words.join(" "));
+    return Noop;
+  }
+
 
 
 

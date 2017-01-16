@@ -40,6 +40,10 @@ class Vocabulary {
     return this.delete(key);
   }
 
+  public inline function keys(): Iterator<String> {
+    return this.voc.keys();
+  }
+
 
   // for standalone testing
   public static function main() {
