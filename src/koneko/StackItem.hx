@@ -13,6 +13,7 @@ enum StackItem {
   QuoteSI     (q: Array<StackItem>);
   BuiltinSI   (f: Stack -> StackItem); // built-in callable static function(Stack): StackItem
 
+  BreakSI;    // signals break for loops
   ErrSI       (e: String); // Operation resulted in error
 
   // not needed yet
@@ -31,6 +32,7 @@ class StackItems {
       case QuoteSI   (_) : "!Quote";
       case BuiltinSI (_) : "!Builtin";
       case ErrSI     (_) : "!Error";
+      case BreakSI       : "!Break";
       case _             : "!Unknown";
     }
   }
@@ -42,7 +44,7 @@ class StackItems {
       case FloatSI   (f) : Std.string(f);
       // case StringSI  (s) : '"${s}"';
       case StringSI  (s) : '"${s.replace("\\n","\\\\n").replace("\\t","\\\\t")}"';
-      case AtomSI    (s) : '"${s}"';
+      case AtomSI    (s) : '<A:${s}>';
       case DefAtomSI     : '"<DefAtom>"';
       case QuoteSI   (q) :
         var a = new Array<String>();
@@ -51,6 +53,7 @@ class StackItems {
         "[" + a.join(" ") + "]";
       case BuiltinSI (_) : "<Builtin>";
       case ErrSI     (_) : "<Error>";
+      case BreakSI       : "<Break>";
       case _             : "<Unknown>";
     }
   }

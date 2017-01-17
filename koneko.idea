@@ -54,21 +54,23 @@ x stack item has it's type as string for generic isOf(type: String) function
 - structured
 * [v] if: [true-br] [false-br] [cond] if
 * [v] when: [true-br] [cond] when
-* [ ] [ words cond|int ] while - loop while TOS after execution is not zero
+* [v] [ words cond|int ] while - loop while TOS after execution is not zero
 
 * [v] words
 
 - combinators?
-* [ ] `i` identity
+* [v] `i` identity
 * [ ]`each`: `[el el] [func] each`
+
+* [ ] Parser: ( comment )
 
 
 * [ ] BigInt much later
 
 
 |17.0116.1546|
-* [ ] Vocabulary: change to Map<String, StackItem>
-* [ ] on definition, make quotes eval atoms to definitions (mainly for builtins), so that
+* [v] Vocabulary: change to Map<String, StackItem>
+* [x] on definition, make quotes eval atoms to definitions (mainly for builtins), so that
       [print "\n" print] : say -> quote(builtin, string, builtin)
 
 * [ ] "string" ns - set current namespace

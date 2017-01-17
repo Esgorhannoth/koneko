@@ -22,6 +22,11 @@ class Builtins {
     return Noop;
   }
 
+  // B-
+  public static function break_loop(s: Stack): StackItem {
+    return BreakSI; // ??
+  }
+
   // C-
   public static function clear_stack(s: Stack): StackItem {
     s.clear();
@@ -51,6 +56,7 @@ class Builtins {
       case QuoteSI   (q) : interp.eval(q, Eager);
       case IntSI     (_) | FloatSI(_) | StringSI(_) : s.push(item);
       case ErrSI     (e) : throw error(e);
+      case BreakSI       : s.push(item); // or throw?
 
       case AtomSI    (s) : throw error('How did atom ${s} get here? 0.o');
       case DefAtomSI     : throw error('How did defatom get here? 0.o');
@@ -255,6 +261,19 @@ class Builtins {
   }
 
   // T-
+  public static function times_loop(s: Stack, interp: Interpreter): StackItem {
+    assert_stack_has(s, 2);
+    var n = s.pop();
+    var body = s.pop();
+    assert_is(n, "!Int");
+    assert_is(body, "!Quote");
+    for( i in 0 ... unwrap_int(n) ) {
+      var eval_r = interp.eval_item(body, Eager);
+      if( eval_r == Break ) break;
+    }
+    return Noop;
+  }
+
   public static function type(s: Stack): StackItem {
     check_underflow(s);
     var item = s.pop();
@@ -284,7 +303,8 @@ class Builtins {
     var body = s.pop();
     assert_is(body, "!Quote");
     do {
-      interp.eval_item(body, Eager);
+      var eval_r = interp.eval_item(body, Eager);
+      if( eval_r == Break ) break;
       var r = s.pop();
       switch( r ) {
         case IntSI(i) : if( i == 0 ) break;
@@ -341,7 +361,7 @@ class Builtins {
 
   static inline function assert_is(si: StackItem, type: String) {
     if( si.type() != type )
-      throw KonekoException.AssertFailureWrongType(si.type());
+      throw KonekoException.AssertFailureWrongType(si.type(), type);
   }
 
   static inline function _3rd(s: Stack): StackCell {

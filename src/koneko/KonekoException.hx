@@ -4,6 +4,6 @@ enum KonekoException {
   StackUnderflow;
   IncompatibleTypes;
   WrongAssertionParam;
-  AssertFailureWrongType(s: String);
+  AssertFailureWrongType(s: String, expect: String);
   Custom(s: String);
 }

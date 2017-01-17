@@ -4,6 +4,7 @@ enum EvalMode {
   Lazy;
   Eager;
   Definition;
+  Break;     // ??  for breaking out of loops
 }
 /**
   1. Parse line
@@ -43,16 +44,20 @@ class Interpreter {
         }
       case DefAtomSI     : 
         throw KonekoException.Custom("DefAtom in AST 0.o");
+      case BreakSI       :
+        throw KonekoException.Custom("Break in AST 0.o");
       case QuoteSI   (q) :
         if( how == Lazy )
           stack.push(item); // just push parsed quote to stack
         else { // Eager
-          eval(q);
+          var r = eval(q);
+          return r;
         }
       case BuiltinSI (f) :
         var si = f(stack);
         return switch( si ) {
           case DefAtomSI    : Definition;
+          case BreakSI      : Break;
           case _            : Lazy;
         }
       case ErrSI     (e) :
@@ -70,7 +75,10 @@ class Interpreter {
     var mode = ( how == null ) ? Lazy : how;
     for( el in ast ) {
       mode = eval_item(el, mode);
+      if( mode == Break )
+        break;
     }
+    return mode;
   }
 
   public function interpret(line: String) {
@@ -78,20 +86,24 @@ class Interpreter {
       var p = new Parser(line);
       var ast = p.parse();
       eval(ast);
-    } catch(e: Dynamic) {
-      if( Std.is(e, KonekoException) ) {
-        out("ERROR: ");
-        say(switch( cast(e, KonekoException) ) {
-          case StackUnderflow      : "Stack Underflow";
-          case IncompatibleTypes   : "Incompatible Type(s)";
-          case WrongAssertionParam : "Debug: Wrong assertion parameter";
-          case AssertFailureWrongType(s) : 'Wrong Type ${s}';
-          case Custom(s)           : s;
-        });
-      }
-      else
-        say(e);
     }
+    catch(e: Dynamic)
+      handleErrors(e);
+  }
+
+  function handleErrors(e: Dynamic) {
+    if( Std.is(e, KonekoException) ) {
+      out("ERROR: ");
+      say(switch( cast(e, KonekoException) ) {
+        case AssertFailureWrongType(s, ex) : 'Wrong Type ${s}, expected ${ex}';
+        case StackUnderflow      : "Stack Underflow";
+        case IncompatibleTypes   : "Incompatible Type(s)";
+        case WrongAssertionParam : "Debug: Wrong assertion parameter";
+        case Custom(s)           : s;
+      });
+    }
+    else
+      say(e);
   }
 
   function init_builtins() {
@@ -125,7 +137,10 @@ class Interpreter {
     add_builtin("if",    Builtins.with_interp(this, Builtins.if_conditional));
     add_builtin("when",  Builtins.with_interp(this, Builtins.when_conditional));
     add_builtin("while", Builtins.with_interp(this, Builtins.while_loop));
+    add_builtin("times", Builtins.with_interp(this, Builtins.times_loop));
     add_builtin(":",     Builtins.define);
+
+    add_builtin("break", Builtins.break_loop);
 
     add_builtin(".s", Builtins.show_stack);
     add_builtin(".",  Builtins.pop_and_print);
