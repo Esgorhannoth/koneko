@@ -93,6 +93,19 @@ class Builtins {
     return Noop;
   }
 
+  public static function math_rounding(func: Float->Int): Stack->StackItem {
+    return function(s: Stack): StackItem {
+      check_underflow(s);
+      var n = s.pop();
+      s.push( switch( n ) {
+        case IntSI(i)   : n;
+        case FloatSI(f) : IntSI(func(f));
+        case _          : throw error("!Int or !Float expected");
+      });
+      return Noop;
+    }
+  }
+
   public static function math_rnd(s: Stack): StackItem {
     s.push( FloatSI( Math.random() ) );
     return Noop;
@@ -362,6 +375,13 @@ class Builtins {
   static inline function assert_is(si: StackItem, type: String) {
     if( si.type() != type )
       throw KonekoException.AssertFailureWrongType(si.type(), type);
+  }
+
+  static inline function assert_one_of(si: StackItem, types: Array<String>) {
+    var type = si.type();
+    for( t in types )
+      if( t == type ) return;
+    throw KonekoException.AssertFailureWrongType(si.type(), types.join(" | "));
   }
 
   static inline function _3rd(s: Stack): StackCell {

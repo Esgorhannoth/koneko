@@ -123,6 +123,9 @@ class Interpreter {
     add_builtin("-",      Builtins.subtract);
     add_builtin("*",      Builtins.multiply);
     add_builtin("negate", Builtins.negate);
+    add_builtin("ceil",   Builtins.math_rounding(Math.ceil));
+    add_builtin("floor",  Builtins.math_rounding(Math.floor));
+    add_builtin("round",  Builtins.math_rounding(Math.round));
 
     add_builtin("random", Builtins.math_random);
     add_builtin("rnd",    Builtins.math_rnd);
