@@ -1,7 +1,11 @@
 package koneko;
 
+import haxe.macro.Expr;
+
 using  StringTools;
 using  koneko.StackItem; // for .type and .toString
+
+enum CompareOp { EQ; NQ; GT; LT; GE; LE; }
 
 /**
   All functions return either a valuable StackItem or Noop;
@@ -86,6 +90,37 @@ class Builtins {
   }
 
   // M-
+  public static function math_compare(op: CompareOp): Stack->StackItem {
+    return function(s: Stack): StackItem {
+      var right = s.pop();
+      var left  = s.pop();
+      var r_type = right.type();
+      var l_type = left.type();
+      var r = false;
+
+      // Both Strings
+      if( l_type == "!String" && r_type == "!String" ) {
+        r = do_compare(unwrap_string(left), unwrap_string(right), op);
+      }
+
+      // Both Ints
+      else if( l_type == "!Int" && r_type == "!Int" ) {
+        r = do_compare(unwrap_int(left), unwrap_int(right), op);
+      }
+
+      // Each must be either Int or Float
+      else {
+        r = do_compare(unwrap_float(left), unwrap_float(right), op);
+      }
+      if( r == true )
+        s.push( IntSI(1) );
+      else
+        s.push( IntSI(0) );
+
+      return Noop;
+      }
+  }
+
   public static function math_random(s: Stack): StackItem {
     check_underflow(s);
     var item = s.pop();
@@ -512,7 +547,7 @@ class Builtins {
   static inline function unwrap_int(si: StackItem): Int {
     return switch( si ) {
       case IntSI(i): i;
-      case _ : throw KonekoException.IncompatibleTypes;
+      case _ : throw error('Expected !Int, but found ${si.type()}');
     }
   }
 
@@ -520,14 +555,25 @@ class Builtins {
     return switch( si ) {
       case IntSI(i)  : cast(i, Float);
       case FloatSI(f): f;
-      case _ : throw KonekoException.IncompatibleTypes;
+      case _ : throw error('Expected either !Int or !Float, but found ${si.type()}');
     }
   }
 
   static inline function unwrap_string(si: StackItem): String {
     return switch( si ) {
       case StringSI(s): s;
-      case _ : throw KonekoException.IncompatibleTypes;
+      case _ : throw error('Expected !String, but found ${si.type()}');
+    }
+  }
+
+  macro static function do_compare(a: Expr, b: Expr, op: Expr): Expr {
+    return macro switch( $op ) {
+      case EQ  : $a == $b;
+      case NQ  : $a != $b;
+      case GT  : $a > $b;
+      case LT  : $a < $b;
+      case GE  : $a >= $b;
+      case LE  : $a <= $b;
     }
   }
 

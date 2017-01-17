@@ -123,6 +123,12 @@ class Interpreter {
     add_builtin("-",      Builtins.subtract);
     add_builtin("*",      Builtins.multiply);
     add_builtin("negate", Builtins.negate);
+    add_builtin("=",      Builtins.math_compare(EQ));
+    add_builtin("!=",     Builtins.math_compare(NQ));
+    add_builtin(">",      Builtins.math_compare(GT));
+    add_builtin("<",      Builtins.math_compare(LT));
+    add_builtin(">=",     Builtins.math_compare(GE));
+    add_builtin("<=",     Builtins.math_compare(LE));
     add_builtin("ceil",   Builtins.math_rounding(Math.ceil));
     add_builtin("floor",  Builtins.math_rounding(Math.floor));
     add_builtin("round",  Builtins.math_rounding(Math.round));

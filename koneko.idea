@@ -39,8 +39,8 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [ ] idiv
 * [ ] fdiv
 * [v] negate
-* [ ] round/ceil/floor
-* [ ] eq/neq/gt/ge/lt/le `NOS gt TOS`
+* [v] round/ceil/floor
+* [v] eq/neq/gt/ge/lt/le `NOS gt TOS`
 * [ ] and/or/xor/not ( 1 (any !=0) - true, 0 - false ) ( 0 not -> 1 )
 * [v] random [0...x) Float
 * [v] rnd [0...1) Float
