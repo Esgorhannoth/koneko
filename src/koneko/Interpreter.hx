@@ -122,7 +122,10 @@ class Interpreter {
     add_builtin("+",      Builtins.add);
     add_builtin("-",      Builtins.subtract);
     add_builtin("*",      Builtins.multiply);
-    add_builtin("negate", Builtins.negate);
+    add_builtin("/",      Builtins.math_division);
+    add_builtin("div",    Builtins.math_int_division);
+    add_builtin("mod",    Builtins.math_modulo);
+    add_builtin("negate", Builtins.math_negate);
     add_builtin("=",      Builtins.math_compare(EQ));
     add_builtin("!=",     Builtins.math_compare(NQ));
     add_builtin(">",      Builtins.math_compare(GT));

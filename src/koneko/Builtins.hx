@@ -121,6 +121,22 @@ class Builtins {
       }
   }
 
+  public static function math_modulo(s: Stack): StackItem {
+    // TODO
+    return Noop;
+  }
+
+  public static function math_negate(s: Stack): StackItem {
+    check_underflow(s);
+    var item = s.pop();
+    switch( item ) {
+      case IntSI(i)   : s.push( IntSI( -i ) );
+      case FloatSI(f) : s.push( FloatSI( -f ) );
+      case _          : throw KonekoException.IncompatibleTypes;
+    }
+    return Noop;
+  }
+
   public static function math_random(s: Stack): StackItem {
     check_underflow(s);
     var item = s.pop();
@@ -158,16 +174,6 @@ class Builtins {
   }
 
   // N-
-  public static function negate(s: Stack): StackItem {
-    check_underflow(s);
-    var item = s.pop();
-    switch( item ) {
-      case IntSI(i)   : s.push( IntSI( -i ) );
-      case FloatSI(f) : s.push( FloatSI( -f ) );
-      case _          : throw KonekoException.IncompatibleTypes;
-    }
-    return Noop;
-  }
 
   // O-
   public static function over(s: Stack): StackItem {

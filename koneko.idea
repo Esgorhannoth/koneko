@@ -78,7 +78,10 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [ ] "string" ns - set current namespace
   ns? - put on stack current namespace
   default is "Main"
-  Vocabulary entries are : "<ns>:<word>"
+* [ ] Vocabulary entries are : "<ns>:<word>"
+
+|17.0118.1435|
+* [ ] Prelude.kn file with common functions, that 'not builtins'
 
 
 main objectives:
