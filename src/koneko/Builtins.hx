@@ -6,6 +6,7 @@ using  StringTools;
 using  koneko.StackItem; // for .type and .toString
 
 enum CompareOp { EQ; NQ; GT; LT; GE; LE; }
+enum LogicalOp { NOT; AND; OR; XOR; }
 
 /**
   All functions return either a valuable StackItem or Noop;
@@ -121,8 +122,65 @@ class Builtins {
       }
   }
 
+  public static function math_division(s: Stack): StackItem {
+    assert_stack_has(s, 2);
+    var tos = s.pop();
+    var nos = s.pop();
+    var dsor = unwrap_float(tos);
+    var dend = unwrap_float(nos);
+    if( dsor == 0 )
+      throw KonekoException.DivisionByZero;
+    s.push( FloatSI( dend / dsor ) );
+    return Noop;
+  }
+
+  public static function math_int_division(s: Stack): StackItem {
+    assert_stack_has(s, 2);
+    var tos = s.pop();
+    var nos = s.pop();
+    var dsor = unwrap_float(tos);
+    var dend = unwrap_float(nos);
+    if( dsor == 0 )
+      throw KonekoException.DivisionByZero;
+    s.push( IntSI( Math.floor(dend / dsor) ) );
+    return Noop;
+  }
+
+  public static function math_logical(op: LogicalOp): Stack->StackItem {
+    return function(s: Stack): StackItem {
+      switch( op ) {
+        case NOT :
+          assert_stack_has(s, 1);
+          var boolv = unwrap_bool(s.pop());
+          s.push( do_logical_op(boolv, false, NOT) );
+        case _   :
+          assert_stack_has(s, 2);
+          var tos = s.pop();
+          var nos = s.pop();
+          var left = unwrap_bool(nos);
+          var right = unwrap_bool(tos);
+          s.push( do_logical_op(left, right, op) );
+      } // switch
+      return Noop;
+    }
+  }
   public static function math_modulo(s: Stack): StackItem {
-    // TODO
+    assert_stack_has(s, 2);
+    var tos = s.pop();
+    var nos = s.pop();
+    if( tos.type() == "!Int" && nos.type() == "!Int" ) {
+      var dend = unwrap_int(nos);
+      var dsor = unwrap_int(tos);
+      if( dsor == 0 )
+        throw KonekoException.DivisionByZero;
+      s.push( IntSI( dend % dsor ) );
+    } else {
+      var dend = unwrap_float(nos);
+      var dsor = unwrap_float(tos);
+      if( dsor == 0 )
+        throw KonekoException.DivisionByZero;
+      s.push( FloatSI( dend % dsor ) );
+    }
     return Noop;
   }
 
@@ -418,6 +476,11 @@ class Builtins {
       throw KonekoException.AssertFailureWrongType(si.type(), type);
   }
 
+  static inline function assert_is_number(si: StackItem) {
+    if( si.type() != "!Int" && si.type() != "!Float" )
+      throw error('Expected number, but found ${si.type()}');
+  }
+
   static inline function assert_one_of(si: StackItem, types: Array<String>) {
     var type = si.type();
     for( t in types )
@@ -565,6 +628,15 @@ class Builtins {
     }
   }
 
+  static inline function unwrap_bool(si: StackItem): Bool {
+    var r = switch( si ) {
+      case IntSI(i)  : cast(i, Float);
+      case FloatSI(f): f;
+      case _ : throw error('Expected either !Int or !Float as boolean, but found ${si.type()}');
+    }
+    return r != 0; // false for 0, true for everything else
+  }
+
   static inline function unwrap_string(si: StackItem): String {
     return switch( si ) {
       case StringSI(s): s;
@@ -581,6 +653,16 @@ class Builtins {
       case GE  : $a >= $b;
       case LE  : $a <= $b;
     }
+  }
+
+  static function do_logical_op(a: Bool, b: Bool, op: LogicalOp): StackItem {
+    var r = switch( op ) {
+      case AND: a && b;
+      case OR : a || b;
+      case XOR: a != b;
+      case NOT: !a;
+    }
+    return IntSI( r == true ? -1 : 0 );
   }
 
   /**

@@ -6,4 +6,5 @@ enum KonekoException {
   WrongAssertionParam;
   AssertFailureWrongType(s: String, expect: String);
   Custom(s: String);
+  DivisionByZero;
 }

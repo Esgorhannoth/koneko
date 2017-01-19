@@ -100,6 +100,7 @@ class Interpreter {
         case IncompatibleTypes   : "Incompatible Type(s)";
         case WrongAssertionParam : "Debug: Wrong assertion parameter";
         case Custom(s)           : s;
+        case DivisionByZero      : "Cannot divide by zero";
       });
     }
     else
@@ -132,6 +133,12 @@ class Interpreter {
     add_builtin("<",      Builtins.math_compare(LT));
     add_builtin(">=",     Builtins.math_compare(GE));
     add_builtin("<=",     Builtins.math_compare(LE));
+
+    add_builtin("not",     Builtins.math_logical(NOT));
+    add_builtin("and",     Builtins.math_logical(AND));
+    add_builtin("or",      Builtins.math_logical(OR));
+    add_builtin("xor",     Builtins.math_logical(XOR));
+
     add_builtin("ceil",   Builtins.math_rounding(Math.ceil));
     add_builtin("floor",  Builtins.math_rounding(Math.floor));
     add_builtin("round",  Builtins.math_rounding(Math.round));

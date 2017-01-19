@@ -36,13 +36,13 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] add
 * [v] sub
 * [v] mult
-* [ ] idiv
-* [ ] fdiv
+* [v] idiv
+* [v] fdiv
 * [v] negate
 * [v] round/ceil/floor
 * [v] eq/neq/gt/ge/lt/le `NOS gt TOS`
-* [ ] and/or/xor/not ( 1 (any !=0) - true, 0 - false ) ( 0 not -> 1 )
-* [v] random [0...x) Float
+* [v] and/or/xor/not ( -1 (any !=0) - true, 0 - false ) ( 0 not -> -1 )
+* [v] random [0...x) Int
 * [v] rnd [0...1) Float
 
 - strings:
