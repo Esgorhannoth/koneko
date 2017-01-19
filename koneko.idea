@@ -52,8 +52,8 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [ ] reverse
 
 - structured
-* [v] if: [true-br] [false-br] [cond] if
-* [v] when: [true-br] [cond] when
+* [v] if: [true-br] [false-br] [cond] if :: -> [cond] [true] [false] if
+* [v] when: [true-br] [cond] when :: -> [cond] [true] when
 * [v] [ words cond|int ] while - loop while TOS after execution is not zero
 * [v] break
 * [v] Q n times

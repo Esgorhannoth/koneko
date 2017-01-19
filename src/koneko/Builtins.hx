@@ -74,9 +74,9 @@ class Builtins {
 
   public static function if_conditional(s: Stack, interp: Interpreter): StackItem {
     assert_stack_has(s, 3);
-    var cond = s.pop();
     var else_br = s.pop();
     var then_br = s.pop();
+    var cond = s.pop();
     assert_is(else_br, "!Quote");
     assert_is(then_br, "!Quote");
     interp.eval_item(cond, Eager);
@@ -396,8 +396,8 @@ class Builtins {
   // W-
   public static function when_conditional(s: Stack, interp: Interpreter): StackItem {
     assert_stack_has(s, 2);
-    var cond = s.pop();
     var then_br = s.pop();
+    var cond = s.pop();
     assert_is(then_br, "!Quote");
     interp.eval_item(cond, Eager);
     var r = s.pop(); // supposedly from evaluation of `cond`
