@@ -436,6 +436,21 @@ class Builtins {
     return Noop;
   }
 
+  public static function string_at(s: Stack): StackItem {
+    var item = s.pop();
+    var str = unwrap_string( s.pop() );
+    var n = unwrap_int(item);
+    try {
+      s.push(
+          StringSI(
+            chars_to_utf8_string(
+              [haxe.Utf8.charCodeAt(str, n)] )));
+    }
+    catch(e: Dynamic)
+      throw error("Index out of bounds");
+    return Noop;
+  }
+
   public static function subtract(s: Stack): StackItem {
     assert_stack_has(s, 2);
     var r = math_subtract(s);
@@ -603,6 +618,11 @@ class Builtins {
     for( t in types )
       if( t == type ) return;
     throw KonekoException.AssertFailureWrongType(si.type(), types.join(" | "));
+  }
+
+  static function assert_valid_utf8(s: String) {
+    if( !haxe.Utf8.validate(s) )
+      throw error("Not a valid UTF-8 string");
   }
 
   static inline function _3rd(s: Stack): StackCell {
@@ -787,6 +807,14 @@ class Builtins {
       case NOT: !a;
     }
     return IntSI( r == true ? -1 : 0 );
+  }
+
+  static function chars_to_utf8_string(chars: Array<Int>): String {
+    // TODO
+    var u = new haxe.Utf8();
+    for ( i in chars )
+      u.addChar(i);
+    return u.toString();
   }
 
   /**

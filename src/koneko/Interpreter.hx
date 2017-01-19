@@ -128,6 +128,7 @@ class Interpreter {
   }
 
   function init_builtins() {
+    // stack manipulation
     add_builtin("dup",           Builtins.dup);
     add_builtin("drop",          Builtins.drop);
     add_builtin("swap",          Builtins.swap);
@@ -136,10 +137,19 @@ class Interpreter {
     add_builtin("rot",           Builtins.rotate_3to1);
     add_builtin("-rot",          Builtins.rotate_1to3);
     add_builtin("clear-stack",   Builtins.clear_stack);
+    add_builtin(".s",            Builtins.show_stack);
+    add_builtin(".",             Builtins.pop_and_print);
+    add_builtin("show-stack",    Builtins.show_debug);
 
-    add_builtin("type?",         Builtins.type);
+    // temp stack manipulation
+    add_builtin(">t",            Builtins.temp_stack_push);
+    add_builtin("<t",            Builtins.temp_stack_pop);
+    add_builtin(".t",            Builtins.temp_stack_show);
 
+    // Strings
+    add_builtin("at",            Builtins.string_at);
 
+    // Math
     add_builtin("+",             Builtins.add);
     add_builtin("-",             Builtins.subtract);
     add_builtin("*",             Builtins.multiply);
@@ -166,8 +176,9 @@ class Interpreter {
     add_builtin("random",        Builtins.math_random);
     add_builtin("rnd",           Builtins.math_rnd);
 
-    add_builtin("sleep",         Builtins.sleep);
 
+    // Quotes
+    add_builtin("i",             Builtins.with_interp(this, Builtins.identity));
     add_builtin("quote",         Builtins.quote_values);
     add_builtin("unquote",       Builtins.unquote_to_values);
     add_builtin("q<",            Builtins.push_to_quote);
@@ -176,35 +187,32 @@ class Interpreter {
     add_builtin("q>",            Builtins.pop_from_quote);
     add_builtin("reverse",       Builtins.reverse_quote);
 
-    // add_builtin("echo",       Builtins.print);
-    add_builtin("print",         Builtins.print);
-    // add_builtin("puts",       Builtins.print);
-
-    add_builtin("i",             Builtins.with_interp(this, Builtins.identity));
+    // looping and branching
     add_builtin("if",            Builtins.with_interp(this, Builtins.if_conditional));
     add_builtin("when",          Builtins.with_interp(this, Builtins.when_conditional));
     add_builtin("while",         Builtins.with_interp(this, Builtins.while_loop));
     add_builtin("times",         Builtins.with_interp(this, Builtins.times_loop));
+
+    // Definitions
     add_builtin(":",             Builtins.define);
     add_builtin("is!",           Builtins.define);
     add_builtin("is",            Builtins.careful_define);
 
     add_builtin("break",         Builtins.break_loop);
 
-    add_builtin(".s",            Builtins.show_stack);
-    add_builtin(".",             Builtins.pop_and_print);
+    // Utils
     add_builtin("words",         Builtins.with_voc(vocabulary, Builtins.words_list));
-    add_builtin("show-stack",    Builtins.show_debug);
+    add_builtin("type?",         Builtins.type);
 
-    add_builtin(">t",            Builtins.temp_stack_push);
-    add_builtin("<t",            Builtins.temp_stack_pop);
-    add_builtin(".t",            Builtins.temp_stack_show);
-
+    // Exiting
     add_builtin("quit/with",     Builtins.quit_with);
     add_builtin("bye",           Builtins.quit);
 
+    // Outer unverse
     add_builtin("args",          Builtins.args_from_cli);
     add_builtin("read-line",     Builtins.read_line_stdin);
+    add_builtin("print",         Builtins.print);
+    add_builtin("sleep",         Builtins.sleep);
   }
 
   inline function add_builtin(key: String, builtin: Stack->StackItem) {

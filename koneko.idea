@@ -46,10 +46,11 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] rnd [0...1) Float
 
 - strings:
-* [ ] at
-* [ ] upcase
-* [ ] downcase
-* [ ] reverse
+* [ ] S N at
+* [ ] S upcase
+* [ ] S downcase
+* [ ] S backwards
+* [ ] S N N substr (string pos len)
 
 - structured
 * [v] if: [true-br] [false-br] [cond] if :: -> [cond] [true] [false] if
