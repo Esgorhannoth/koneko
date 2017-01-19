@@ -27,6 +27,15 @@ class Builtins {
     return Noop;
   }
 
+  public static function args_from_cli(s: Stack): StackItem {
+    var args = Sys.args();
+    var q = new Array<StackItem>();
+    for (a in args)
+      q.push( StringSI(a) );
+    s.push( QuoteSI(q) );
+    return Noop;
+  }
+
   // B-
   public static function break_loop(s: Stack): StackItem {
     return BreakSI; // ??
@@ -343,6 +352,12 @@ class Builtins {
   }
 
   // R-
+  public static function read_line_stdin(s: Stack): StackItem {
+    var line = Sys.stdin().readLine();
+    s.push( StringSI( line ) );
+    return Noop;
+  }
+
   public static function reverse_quote(s: Stack): StackItem {
     assert_stack_has(s, 1);
     var q = unwrap_quote( s.pop() );

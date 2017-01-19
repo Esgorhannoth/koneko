@@ -68,6 +68,9 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] definition via `:` and `is!`
 * [v] careful definition via `is` (does not bind word if it already has value)
 
+* [v] args ( - Q(args) ) : Sys.args();
+* [v] read-line ( - S(line) )
+
 - combinators?
 * [v] `i` identity
 * [ ]`each`: `[el el] [func] each`

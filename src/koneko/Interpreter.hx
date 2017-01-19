@@ -198,6 +198,9 @@ class Interpreter {
 
     add_builtin("quit/with",     Builtins.quit_with);
     add_builtin("bye",           Builtins.quit);
+
+    add_builtin("args",          Builtins.args_from_cli);
+    add_builtin("read-line",     Builtins.read_line_stdin);
   }
 
   inline function add_builtin(key: String, builtin: Stack->StackItem) {
