@@ -20,7 +20,7 @@ class Interpreter {
 
   public function new() {
     this.vocabulary = new Vocabulary();
-    this.stack      = new Stack();
+    this.stack      = new Stack(true); // with temporary stack inside
     init_builtins();
   }
 

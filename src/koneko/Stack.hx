@@ -24,9 +24,12 @@ class Stack implements IStack {
 
   public var tmp                  : Stack; // additional stack for holding temporary values
 
-  public function new() {
+  public function new(?with_tmp: Bool) {
+    if( null == with_tmp )
+      with_tmp = false;
     this.length = 0;
-    this.tmp = new Stack();
+    if( with_tmp )
+      this.tmp = new Stack();
   }
 
   public function push(e: StackItem): Stack // fluent interface ?
