@@ -4,6 +4,7 @@ enum EvalMode {
   Lazy;
   Eager;
   Definition;
+  MaybeDefinition;
   Break;     // ??  for breaking out of loops
 }
 /**
@@ -30,11 +31,26 @@ class Interpreter {
     switch( item ) {
       case IntSI     (_) | FloatSI(_) | StringSI(_) : stack.push(item);
       case AtomSI    (s) :
+        // define
         if( how == Definition ) {
           if( stack.is_empty() )
             throw KonekoException.StackUnderflow;
           else // bind `s` to TOS
             vocabulary.set(s, stack.pop());
+          return Lazy;
+        }
+
+        // Maybe define
+        if( how == MaybeDefinition ) {
+          if( stack.is_empty() )
+            throw KonekoException.StackUnderflow;
+          else // bind `s` to TOS
+            if( vocabulary.exists(s) ) {
+              stack.pop(); // pop possible definition anyway
+              throw KonekoException.AlreadyDefined(s);
+            }
+            else
+              vocabulary.set(s, stack.pop());
           return Lazy;
         }
         var si = vocabulary.get(s);
@@ -44,6 +60,8 @@ class Interpreter {
         }
       case DefAtomSI     : 
         throw KonekoException.Custom("DefAtom in AST 0.o");
+      case MaybeDefSI    : 
+        throw KonekoException.Custom("MaybeDef in AST 0.o");
       case BreakSI       :
         throw KonekoException.Custom("Break in AST 0.o");
       case QuoteSI   (q) :
@@ -57,6 +75,7 @@ class Interpreter {
         var si = f(stack);
         return switch( si ) {
           case DefAtomSI    : Definition;
+          case MaybeDefSI   : MaybeDefinition;
           case BreakSI      : Break;
           case _            : Lazy;
         }
@@ -101,6 +120,7 @@ class Interpreter {
         case WrongAssertionParam : "Debug: Wrong assertion parameter";
         case Custom(s)           : s;
         case DivisionByZero      : "Cannot divide by zero";
+        case AlreadyDefined(s)   : 'Word $s is already defined';
       });
     }
     else
@@ -148,9 +168,9 @@ class Interpreter {
 
     add_builtin("sleep",  Builtins.sleep);
 
-    add_builtin("echo",  Builtins.print);
+    // add_builtin("echo",  Builtins.print);
     add_builtin("print", Builtins.print);
-    add_builtin("puts",  Builtins.print);
+    // add_builtin("puts",  Builtins.print);
 
     add_builtin("i",     Builtins.with_interp(this, Builtins.identity));
     add_builtin("if",    Builtins.with_interp(this, Builtins.if_conditional));
@@ -158,6 +178,8 @@ class Interpreter {
     add_builtin("while", Builtins.with_interp(this, Builtins.while_loop));
     add_builtin("times", Builtins.with_interp(this, Builtins.times_loop));
     add_builtin(":",     Builtins.define);
+    add_builtin("is!",   Builtins.define);
+    add_builtin("is",    Builtins.careful_define);
 
     add_builtin("break", Builtins.break_loop);
 

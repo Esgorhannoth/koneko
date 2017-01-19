@@ -60,6 +60,13 @@ x stack item has it's type as string for generic isOf(type: String) function
 
 * [v] words
 
+* [ ] N quote - turns N values on stack into quote: 1 2 3 3 quote -> [1 2 3]
+* [ ] V Q append - appends V to the end of Q
+* [ ] V Q prepend - prepends V to the beginning of Q
+
+* [v] definition via `:` and `is!`
+* [v] careful definition via `is` (does not bind word if it already has value)
+
 - combinators?
 * [v] `i` identity
 * [ ]`each`: `[el el] [func] each`

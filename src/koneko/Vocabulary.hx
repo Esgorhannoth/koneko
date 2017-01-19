@@ -11,6 +11,9 @@ class Vocabulary {
     this.voc = new Map<String, StackItem>();
   }
 
+  public function exists(key: String): Bool {
+    return this.voc.exists(key);
+  }
   public function get(key: String): StackItem {
     // no such atom
     if( !voc.exists(key) )

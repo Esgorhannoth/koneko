@@ -33,6 +33,11 @@ class Builtins {
   }
 
   // C-
+  public static function careful_define(s: Stack): StackItem {
+    check_underflow(s);
+    return MaybeDefSI;
+  }
+
   public static function clear_stack(s: Stack): StackItem {
     s.clear();
     return Noop;
@@ -43,6 +48,7 @@ class Builtins {
     check_underflow(s);
     return DefAtomSI;
   }
+
   public static function drop(s: Stack): StackItem {
     assert_stack_has(s, 1);
     return s.pop();
@@ -65,6 +71,7 @@ class Builtins {
 
       case AtomSI    (s) : throw error('How did atom ${s} get here? 0.o');
       case DefAtomSI     : throw error('How did defatom get here? 0.o');
+      case MaybeDefSI    : throw error('How did maybedef get here? 0.o');
       case BuiltinSI (_) : throw error('How did builting get here? 0.o');
       case Noop          : // do nothing
       case PartQuoteSI(_): // should not meet at all
@@ -380,7 +387,8 @@ class Builtins {
     assert_is(n, "!Int");
     assert_is(body, "!Quote");
     for( i in 0 ... unwrap_int(n) ) {
-      var eval_r = interp.eval_item(body, Eager);
+      // var eval_r = interp.eval_item(body, Eager);
+      var eval_r = interp.eval(unwrap_quote(body), Eager);
       if( eval_r == Break ) break;
     }
     return Noop;
@@ -641,6 +649,13 @@ class Builtins {
     return switch( si ) {
       case StringSI(s): s;
       case _ : throw error('Expected !String, but found ${si.type()}');
+    }
+  }
+
+  static inline function unwrap_quote(si: StackItem): Array<StackItem> {
+    return switch( si ) {
+      case QuoteSI(q) : q;
+      case _          : throw error('Expected !Quote, but found ${si.type()}');
     }
   }
 

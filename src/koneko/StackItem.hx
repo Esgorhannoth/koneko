@@ -6,6 +6,7 @@ using  koneko.StackItem;
 enum StackItem {
   Noop;
   DefAtomSI;    // mode switcher
+  MaybeDefSI;   // mode switcher
   IntSI       (i: Int);
   FloatSI     (f: Float);
   StringSI    (s: String);
@@ -29,6 +30,7 @@ class StackItems {
       case StringSI  (_) : "!String";
       case AtomSI    (_) : "!Atom";
       case DefAtomSI     : "!DefAtom";
+      case MaybeDefSI    : "!MaybeDef";
       case QuoteSI   (_) : "!Quote";
       case BuiltinSI (_) : "!Builtin";
       case ErrSI     (_) : "!Error";
@@ -46,6 +48,7 @@ class StackItems {
       case StringSI  (s) : '"${s.replace("\\n","\\\\n").replace("\\t","\\\\t")}"';
       case AtomSI    (s) : '<A:${s}>';
       case DefAtomSI     : '"<DefAtom>"';
+      case MaybeDefSI    : '"<MaybeDef>"';
       case QuoteSI   (q) :
         var a = new Array<String>();
         for ( i in q )

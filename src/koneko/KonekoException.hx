@@ -7,4 +7,5 @@ enum KonekoException {
   AssertFailureWrongType(s: String, expect: String);
   Custom(s: String);
   DivisionByZero;
+  AlreadyDefined(s: String);
 }
