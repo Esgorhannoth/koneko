@@ -39,7 +39,9 @@ class Parser {
         case RBracket      : return ast;
         // not yet implemented
         // case LParen | LBrace | RParen | RBrace : input.croak("Not yet implemented");
-        case LParen | LBrace | RParen | RBrace : skip_token();
+        case LParen        : skip_until(RParen);
+        case RParen        : skip_token();
+        case LBrace | RBrace : skip_token();
         // else
         case None : continue;
         case EOF  : break; // should be unreachable
@@ -92,9 +94,17 @@ class Parser {
       input.next();
   }
 
+  inline function skip_until(t: Token) {
+    var tok = input.peek();
+    while( tok != RParen ) {
+      skip_token();
+      tok = input.peek();
+    }
+  }
+
   // for standalone testing
   public static function main() {
-    var test_s = "stop 'right' \"there\" [ criminal [scum!] ] 42 12! 1+";
+    var test_s = "stop 'right' \"there\" [ criminal [scum!] ] 42 12! (here be comments 12)1+";
     var p = new Parser(test_s);
     var ast = p.parse();
     for ( node in ast )

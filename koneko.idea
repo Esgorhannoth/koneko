@@ -46,7 +46,7 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] rnd [0...1) Float
 
 - strings:
-* [ ] S N at
+* [v] S N at
 * [ ] S upcase
 * [ ] S downcase
 * [ ] S backwards
@@ -76,7 +76,6 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] `i` identity
 * [ ]`each`: `[el el] [func] each`
 
-* [ ] Parser: ( comment )
 
 
 * [ ] BigInt much later
@@ -98,6 +97,7 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] additional stack for holding temporary values : stack.tmp
 * [v] >t, <t, .t - builtins for manipulating temporary stack
      e.g. 2over w/ .t : [ >t rot <t ] is 2over
+* [v] Parser: ( comment )
 
 
 main objectives:
