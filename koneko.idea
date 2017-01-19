@@ -83,8 +83,6 @@ x stack item has it's type as string for generic isOf(type: String) function
 
 |17.0116.1546|
 * [v] Vocabulary: change to Map<String, StackItem>
-* [x] on definition, make quotes eval atoms to definitions (mainly for builtins), so that
-      [print "\n" print] : say -> quote(builtin, string, builtin)
 
 * [ ] "string" ns - set current namespace
   ns? - put on stack current namespace
@@ -93,6 +91,12 @@ x stack item has it's type as string for generic isOf(type: String) function
 
 |17.0118.1435|
 * [ ] Prelude.kn file with common functions, that 'not builtins'
+  + true, false, 2dup, 2over, 2swap
+
+|17.0119.1426|
+* [v] additional stack for holding temporary values : stack.tmp
+* [v] >t, <t, .t - builtins for manipulating temporary stack
+     e.g. 2over w/ .t : [ >t rot <t ] is 2over
 
 
 main objectives:
@@ -107,20 +111,3 @@ main objectives:
   ok
   >
 . 'ok's ?
-
-
-
-OLD
-===
-. Interpreter (for now at least)
-. BigInt for integer ?
-. Float
-. Bool
-. String (interpolation??) - double quoted
-. List? Array? Map?
-. Quote == lambda (delayed execution) [ quote ]
-
-. Loops (for? while?)
-. Conditinos (if?)
-. vars? (def)
-. words? (def)

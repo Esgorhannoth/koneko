@@ -22,8 +22,11 @@ class Stack implements IStack {
   public var head                 : StackCell;
   public var length(default, null): Int;
 
+  public var tmp                  : Stack; // additional stack for holding temporary values
+
   public function new() {
     this.length = 0;
+    this.tmp = new Stack();
   }
 
   public function push(e: StackItem): Stack // fluent interface ?

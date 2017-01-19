@@ -412,7 +412,6 @@ class Builtins {
     return Noop;
   }
 
-  // TODO Debug
   public static function show_stack(s: Stack): StackItem {
     var sb = new StringBuf();
     var a = new Array<String>();
@@ -455,6 +454,21 @@ class Builtins {
   }
 
   // T-
+  public static function temp_stack_pop(s: Stack): StackItem {
+    assert_stack_has(s.tmp, 1);
+    s.push( s.tmp.pop() );
+    return Noop;
+  }
+  public static function temp_stack_push(s: Stack): StackItem {
+    assert_stack_has(s, 1);
+    s.tmp.push( s.pop() );
+    return Noop;
+  }
+  public static function temp_stack_show(s: Stack): StackItem {
+    show_stack(s.tmp);
+    return Noop;
+  }
+
   public static function times_loop(s: Stack, interp: Interpreter): StackItem {
     assert_stack_has(s, 2);
     var n = s.pop();
