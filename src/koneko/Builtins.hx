@@ -296,9 +296,11 @@ class Builtins {
           case StringSI(s)  : s;
           case AtomSI(s)    : '<A:$s>';
           case DefAtomSI    : '<DefAtom>';
+          case MaybeDefSI   : '<MaybeDef>';
           case QuoteSI(_)   : '<Quote>';
           case BuiltinSI(_) : '<Builtin>';
           case Noop         : '<Noop>';
+          case ErrSI(s)     : 'ERROR: $s';
           case _            : '<Unknown>';
         }
     );
@@ -353,8 +355,12 @@ class Builtins {
 
   // R-
   public static function read_line_stdin(s: Stack): StackItem {
-    var line = Sys.stdin().readLine();
-    s.push( StringSI( line ) );
+    try {
+      var line = Sys.stdin().readLine();
+      s.push( StringSI( line ) );
+    }
+    catch(e: Dynamic)
+      s.push( ErrSI("EOF") );
     return Noop;
   }
 
