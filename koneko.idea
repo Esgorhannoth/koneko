@@ -60,9 +60,10 @@ x stack item has it's type as string for generic isOf(type: String) function
 
 * [v] words
 
-* [ ] N quote - turns N values on stack into quote: 1 2 3 3 quote -> [1 2 3]
-* [ ] V Q append - appends V to the end of Q
-* [ ] V Q prepend - prepends V to the beginning of Q
+* [v] N quote - turns N values on stack into quote: 1 2 3 3 quote -> [1 2 3]
+* [v] unquote - turns quote on stack to sequence of values on stack: [1 2 3] -> 1 2 3
+* [v] >q, q<, <q, q> - unshift to quote, push to quote, shift from quote, pop from quote
+* [v] Q reverse : [ 1 2 3 ] -> [ 3 2 1 ]
 
 * [v] definition via `:` and `is!`
 * [v] careful definition via `is` (does not bind word if it already has value)

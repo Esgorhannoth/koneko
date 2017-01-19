@@ -265,6 +265,18 @@ class Builtins {
     return Noop;
   }
 
+  public static function pop_from_quote(s: Stack): StackItem {
+    assert_stack_has(s, 1);
+    var q = unwrap_quote( s.pop() );
+    if( q.length < 1 )
+      throw error("Cannot get last element from empty quote");
+    var v = q.pop();
+    s.push( QuoteSI(q) );
+    s.push( v );
+    // result on stack: [Q w/o last element] <last element of Q>
+    return Noop;
+  }
+
   public static function print(s: Stack): StackItem {
     check_underflow(s);
     var el = s.pop();
@@ -281,6 +293,16 @@ class Builtins {
           case _            : '<Unknown>';
         }
     );
+    return Noop;
+  }
+
+  public static function push_to_quote(s: Stack): StackItem {
+    // [Q] V q<
+    assert_stack_has(s, 2);
+    var v = s.pop();
+    var q = unwrap_quote( s.pop() );
+    q.push(v);
+    s.push(QuoteSI(q));
     return Noop;
   }
 
@@ -308,7 +330,27 @@ class Builtins {
     return Noop;
   }
 
+  public static function quote_values(s: Stack): StackItem {
+    var item = s.pop();
+    assert_is(item, "!Int");
+    var n = unwrap_int(item);
+    assert_stack_has(s, n);
+    var a = new Array<StackItem>();
+    for( i in 0 ... n )
+      a.unshift(s.pop());
+    s.push(QuoteSI(a));
+    return Noop;
+  }
+
   // R-
+  public static function reverse_quote(s: Stack): StackItem {
+    assert_stack_has(s, 1);
+    var q = unwrap_quote( s.pop() );
+    q.reverse();
+    s.push( QuoteSI(q) );
+    return Noop;
+  }
+
   // -rot : 1 2 3 -> 3 1 2
   public static function rotate_1to3(s: Stack): StackItem {
     var tmp: StackCell = nth(s, 0); // save TOS
@@ -332,6 +374,18 @@ class Builtins {
   }
 
   // S-
+  public static function shift_from_quote(s: Stack): StackItem {
+    assert_stack_has(s, 1);
+    var q = unwrap_quote( s.pop() );
+    if( q.length < 1 )
+      throw error("Cannot get first element from empty quote");
+    var v = q.shift();
+    s.push( QuoteSI(q) );
+    s.push( v );
+    // result on stack: [Q w/o 1st element] <1st element of Q>
+    return Noop;
+  }
+
   public static function show_debug(s: Stack): StackItem {
     say(s.toString());
     return Noop;
@@ -398,6 +452,26 @@ class Builtins {
     check_underflow(s);
     var item = s.pop();
     s.push( StringSI( item.type() ) );
+    return Noop;
+  }
+
+  // U-
+  public static function unquote_to_values(s: Stack): StackItem {
+    assert_stack_has(s, 1);
+    var q = unwrap_quote( s.pop() );
+    for( i in q )
+      s.push( i );
+    return Noop;
+  }
+
+  public static function unshift_to_quote(s: Stack): StackItem {
+    // V [Q] >q
+    assert_stack_has(s, 2);
+    var qt = s.pop(); // need to pop into variable here
+    var v = s.pop();
+    var q = unwrap_quote(qt);
+    q.unshift(v);
+    s.push(QuoteSI(q));
     return Noop;
   }
 
@@ -473,7 +547,7 @@ class Builtins {
   }
 
   static function assert_stack_has(s: Stack, n: Int) {
-    if( n < 1 )
+    if( n < 0 )
       throw KonekoException.WrongAssertionParam;
     if( s.length < n )
       throw KonekoException.StackUnderflow;
