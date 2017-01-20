@@ -128,6 +128,10 @@ class Interpreter {
   }
 
   function init_builtins() {
+    // assertion
+    add_builtin("assert",        Builtins.assert_true);
+    add_builtin("assert/msg",    Builtins.assert_true_msg);
+
     // stack manipulation
     add_builtin("dup",           Builtins.dup);
     add_builtin("drop",          Builtins.drop);

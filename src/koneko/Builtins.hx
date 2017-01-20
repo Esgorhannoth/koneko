@@ -36,6 +36,28 @@ class Builtins {
     return Noop;
   }
 
+  public static function assert_true(s: Stack): StackItem {
+    assert_stack_has(s, 1);
+    var cond = unwrap_bool( s.pop() );
+    if( !cond  )
+      return BreakSI;
+    return Noop;
+  }
+
+  public static function assert_true_msg(s: Stack): StackItem {
+    assert_stack_has(s, 2);
+    var item = s.pop();
+    var b    = s.pop();
+    var msg  = unwrap_string(item);
+    var cond = unwrap_bool(b);
+    if( !cond ) {
+      out("Failed: ");
+      say(msg);
+      return BreakSI;
+    }
+    return Noop;
+  }
+
   // B-
   public static function break_loop(s: Stack): StackItem {
     return BreakSI; // ??
