@@ -295,7 +295,8 @@ class Builtins {
       else if( s1 > s2 ) return 1;
       else return -1;
     });
-    say(words.join(" "));
+    out('<ns:${ns}>   ');
+    say(words.join("  "));
     return Noop;
   }
 
@@ -637,7 +638,29 @@ class Builtins {
       else if( s1 > s2 ) return 1;
       else return -1;
     });
-    say(words.join(" "));
+
+    // say(words.join(" "));
+    var cur_ns = ":";
+    var ns_len = 0;
+    var fst_line = true;
+    var sb = new StringBuf();
+    for( w in words ) {
+      // update namespace
+      if( !w.startsWith(cur_ns) ) {
+        var i = w.indexOf(":") + 1;
+        cur_ns = w.substring(0, i);
+        ns_len = i;
+        if( fst_line )
+          fst_line = false;
+        else
+          sb.add("\n\n");
+        sb.add(cur_ns);
+        sb.add("\n=-=-=-=-=\n");
+      }
+      sb.add("  ");
+      sb.add(w.substr(ns_len));
+    } // for words
+    say(sb.toString());
     return Noop;
   }
 

@@ -103,6 +103,12 @@ x stack item has it's type as string for generic isOf(type: String) function
      e.g. 2over w/ .t : [ >t rot <t ] is 2over
 * [v] Parser: ( comment )
 
+|17.0120.1503|
+* [v] all-words, words, ns-words - make pretty print
+* [ ] undef words that are no longer needed : [atom+] undef
+* [ ] defined? | def?  - check if word is defined
+* [ ] ns-defined? | ns-def? - check if ns exists
+
 
 main objectives:
 . [v] InputStream (inst'ed via Lexer)
