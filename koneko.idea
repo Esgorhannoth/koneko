@@ -25,9 +25,10 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] drop
 * [v] over
 * [v] pick
-* [ ] 2dup
-* [ ] 2swap
-* [ ] 2over
+
+* [v] 2dup
+* [v] 2swap
+* [v] 2over
 
 - stack item:
 * [v] type? : type e.g. !String, !Noop, !Int
@@ -47,10 +48,18 @@ x stack item has it's type as string for generic isOf(type: String) function
 
 - strings:
 * [v] S N at
-* [ ] S upcase
-* [ ] S downcase
-* [ ] S backwards
+* [ ] S upcase | uc  (manually for ascii and utf-8 cyrillic)
+* [ ] S downcase | dc
+* [ ] S backwards | back (?)
+* [ ] to-str - convert TOS to string (via toString?)
+* [ ] S N substr (string pos)
 * [ ] S N N substr (string pos len)
+* [ ] S N N subrange (string pos end) [pos, end)
+
+* [ ] S N atc `c - code`
+* [ ] chars as Int
+* [ ] chr->str - char (int) to utf8 string
+* [ ] chars->str - quote of chars (int) to utf8 string
 
 - structured
 * [v] if: [true-br] [false-br] [cond] if :: -> [cond] [true] [false] if
