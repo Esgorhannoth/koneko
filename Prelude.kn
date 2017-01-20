@@ -1,4 +1,12 @@
 "Prelude" ns
+(S type exptected)
+[ swap type? = assert ] is assert-type
+
+[ "!String" assert-type ] is assert-string
+[ "!Int"    assert-type ] is assert-int
+[ "!Float"  assert-type ] is assert-float
+[ "!Quote"  assert-type ] is assert-quote
+
 [print "\n" print] is say
 
 [1 negate] is true

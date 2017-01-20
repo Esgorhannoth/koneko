@@ -77,7 +77,7 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [ ] `each`: `[el el] [func] each`
 
 * [v] assert : `break`s on false on stack
-* [ ] S assert-type : `break`s on wrong type
+* [v] S assert-type : `break`s on wrong type
 * [v] S assert/msg : same as assert, but prints S message on false
 
 * [v] .sl, .tl - stack length and temp stack length
@@ -88,13 +88,13 @@ x stack item has it's type as string for generic isOf(type: String) function
 |17.0116.1546|
 * [v] Vocabulary: change to Map<String, StackItem>
 
-* [ ] "string" ns - set current namespace
-  ns? - put on stack current namespace
+* [v] "string" ns - set current namespace
+  [v] ns? - put on stack current namespace
   default is "Main"
-* [ ] Vocabulary entries are : "<ns>:<word>"
+* [v] Vocabulary entries are : "<ns>:<word>"
 
 |17.0118.1435|
-* [ ] Prelude.kn file with common functions, that 'not builtins'
+* [v] Prelude.kn file with common functions, that 'not builtins'
   + true, false, 2dup, 2over, 2swap
 
 |17.0119.1426|
@@ -105,14 +105,14 @@ x stack item has it's type as string for generic isOf(type: String) function
 
 
 main objectives:
-. InputStream (inst'ed via Lexer)
-. Lexer
-. Parser
-. Interpretation
-. Multi-line quotes definition ?
+. [v] InputStream (inst'ed via Lexer)
+. [v] Lexer
+. [v] Parser
+. [v] Interpretation
+. [ ] Multi-line quotes definition ?
   e.g.
   > [ word word
   |   word word word ]
   ok
   >
-. 'ok's ?
+. [x] 'ok's ?
