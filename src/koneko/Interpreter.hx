@@ -142,6 +142,7 @@ class Interpreter {
     add_builtin("-rot",          Builtins.rotate_1to3);
     add_builtin("clear-stack",   Builtins.clear_stack);
     add_builtin(".s",            Builtins.show_stack);
+    add_builtin(".sl",           Builtins.stack_length);
     add_builtin(".",             Builtins.pop_and_print);
     add_builtin("show-stack",    Builtins.show_debug);
 
@@ -149,6 +150,7 @@ class Interpreter {
     add_builtin(">t",            Builtins.temp_stack_push);
     add_builtin("<t",            Builtins.temp_stack_pop);
     add_builtin(".t",            Builtins.temp_stack_show);
+    add_builtin(".tl",           Builtins.temp_stack_length);
 
     // Strings
     add_builtin("at",            Builtins.string_at);

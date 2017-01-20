@@ -458,6 +458,11 @@ class Builtins {
     return Noop;
   }
 
+  public static function stack_length(s: Stack): StackItem {
+    s.push( IntSI( s.length ) );
+    return Noop;
+  }
+
   public static function string_at(s: Stack): StackItem {
     var item = s.pop();
     var str = unwrap_string( s.pop() );
@@ -491,6 +496,11 @@ class Builtins {
   }
 
   // T-
+  public static function temp_stack_length(s: Stack): StackItem {
+    s.push( IntSI( s.tmp.length ) );
+    return Noop;
+  }
+
   public static function temp_stack_pop(s: Stack): StackItem {
     assert_stack_has(s.tmp, 1);
     s.push( s.tmp.pop() );
