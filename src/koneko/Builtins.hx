@@ -270,6 +270,41 @@ class Builtins {
   }
 
   // N-
+  public static function namespace_cur_words(s: Stack, voc: Vocabulary): StackItem {
+    s.push( StringSI( voc.current_ns ) );
+    return namespace_words_list(s, voc);
+  }
+
+  public static function namespace_get(s: Stack, voc: Vocabulary): StackItem {
+    s.push( StringSI( voc.current_ns ) );
+    return Noop;
+  }
+
+  public static function namespace_words_list(s: Stack, voc: Vocabulary): StackItem {
+    assert_stack_has(s, 1);
+    var ns = unwrap_string( s.pop() );
+    var ns_len = ns.length + 1; // eat ":"
+
+    var words = new Array<String>();
+    for (i in voc.keys()) {
+      if( i.startsWith(ns) )
+      words.push(i.substr(ns_len));
+    }
+    words.sort(function(s1: String, s2: String): Int {
+      if( s1 == s2 ) return 0;
+      else if( s1 > s2 ) return 1;
+      else return -1;
+    });
+    say(words.join(" "));
+    return Noop;
+  }
+
+  public static function namespace_set(s: Stack, voc: Vocabulary): StackItem {
+    assert_stack_has(s, 1);
+    var ns = unwrap_string( s.pop() );
+    voc.current_ns = ns;
+    return Noop;
+  }
 
   // O-
   public static function over(s: Stack): StackItem {
@@ -293,6 +328,7 @@ class Builtins {
   public static function pop_and_print(s: Stack): StackItem {
     check_underflow(s);
     out(s.pop().toString());
+    out(" ");
     return Noop;
   }
 

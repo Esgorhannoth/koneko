@@ -1,9 +1,11 @@
+"Prelude" ns
 [print "\n" print] is say
 
-[-1] is true
+[1 negate] is true
 [0] is false
 
 [over over] is 2dup
 [rot >t rot <t] is 2swap
 [>t >t 2dup <t -rot <t -rot] is 2over
 
+"Main" ns

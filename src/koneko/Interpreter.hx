@@ -19,7 +19,7 @@ class Interpreter {
 
 
   public function new() {
-    this.vocabulary = new Vocabulary();
+    this.vocabulary = new Vocabulary("Prelude");
     this.stack      = new Stack(true); // with temporary stack inside
     init_builtins();
   }
@@ -45,7 +45,7 @@ class Interpreter {
           if( stack.is_empty() )
             throw KonekoException.StackUnderflow;
           else // bind `s` to TOS
-            if( vocabulary.exists(s) ) {
+            if( vocabulary.exists_in_current(s) ) {
               stack.pop(); // pop possible definition anyway
               throw KonekoException.AlreadyDefined(s);
             }
@@ -207,8 +207,14 @@ class Interpreter {
     add_builtin("break",         Builtins.break_loop);
 
     // Utils
-    add_builtin("words",         Builtins.with_voc(vocabulary, Builtins.words_list));
+    add_builtin("all-words",     Builtins.with_voc(vocabulary, Builtins.words_list));
     add_builtin("type?",         Builtins.type);
+
+    // namespace
+    add_builtin("ns",            Builtins.with_voc(vocabulary, Builtins.namespace_set));
+    add_builtin("ns?",           Builtins.with_voc(vocabulary, Builtins.namespace_get));
+    add_builtin("ns-words",      Builtins.with_voc(vocabulary, Builtins.namespace_words_list));
+    add_builtin("words",         Builtins.with_voc(vocabulary, Builtins.namespace_cur_words));
 
     // Exiting
     add_builtin("quit/with",     Builtins.quit_with);
