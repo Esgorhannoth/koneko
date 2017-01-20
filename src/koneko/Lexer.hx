@@ -108,6 +108,7 @@ class Lexer {
             switch( ch ) {
               case "n".code  : "\n".code;
               case "t".code  : "\t".code;
+              case "e".code  : "\033".code;
               case "\\".code : "\\".code;
               case "'".code  : "'".code;
               case "\"".code : "\"".code;
