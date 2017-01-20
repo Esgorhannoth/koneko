@@ -80,6 +80,39 @@ class Builtins {
     return DefAtomSI;
   }
 
+  public static function define_check_word(s: Stack, voc: Vocabulary): StackItem {
+    check_underflow(s);
+    var q = unwrap_quote( s.pop() );
+    if( q.length <=0 )
+      throw error("No word to check in quote");
+    if( q.length > 1 )
+      throw error("Cannot check more then 1 word");
+    var atom = q.shift();
+    assert_is(atom, "!Atom");
+    var key = unwrap_atom(atom);
+    if( voc.exists(key) )
+      s.push( IntSI( -1 ) ); //true
+    else
+      s.push( IntSI( 0 ) ); // false
+    return Noop;
+  }
+
+  public static function define_undefine(s: Stack, voc: Vocabulary): StackItem {
+    check_underflow(s);
+    var q = unwrap_quote( s.pop() );
+    try {
+      for( a in q )
+        assert_is(a, "!Atom");
+    }
+    catch(e: Dynamic) {
+      throw error("Non-atom in undef list");
+    }
+    for( a in q ) {
+      voc.remove( unwrap_atom(a) );
+    }
+    return Noop;
+  }
+
   public static function drop(s: Stack): StackItem {
     assert_stack_has(s, 1);
     return s.pop();
@@ -275,8 +308,28 @@ class Builtins {
     return namespace_words_list(s, voc);
   }
 
+  public static function namespace_check_defined(s: Stack, voc: Vocabulary): StackItem {
+    assert_stack_has(s, 1);
+    var ns = unwrap_string( s.pop() );
+    for( k in voc.keys() )
+      if( k.startsWith(ns) ) {
+        s.push( IntSI( -1 ) ); // true
+        return Noop;
+      }
+    // false
+    s.push( IntSI( 0 ) );
+    return Noop;
+  }
+
   public static function namespace_get(s: Stack, voc: Vocabulary): StackItem {
     s.push( StringSI( voc.current_ns ) );
+    return Noop;
+  }
+
+  public static function namespace_set(s: Stack, voc: Vocabulary): StackItem {
+    assert_stack_has(s, 1);
+    var ns = unwrap_string( s.pop() );
+    voc.current_ns = ns;
     return Noop;
   }
 
@@ -297,13 +350,6 @@ class Builtins {
     });
     out('<ns:${ns}>   ');
     say(words.join("  "));
-    return Noop;
-  }
-
-  public static function namespace_set(s: Stack, voc: Vocabulary): StackItem {
-    assert_stack_has(s, 1);
-    var ns = unwrap_string( s.pop() );
-    voc.current_ns = ns;
     return Noop;
   }
 
@@ -875,6 +921,13 @@ class Builtins {
   static inline function unwrap_quote(si: StackItem): Array<StackItem> {
     return switch( si ) {
       case QuoteSI(q) : q;
+      case _          : throw error('Expected !Quote, but found ${si.type()}');
+    }
+  }
+
+  static inline function unwrap_atom(si: StackItem): String {
+    return switch( si ) {
+      case AtomSI(s)  : s;
       case _          : throw error('Expected !Quote, but found ${si.type()}');
     }
   }

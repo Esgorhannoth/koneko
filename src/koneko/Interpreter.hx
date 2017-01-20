@@ -203,6 +203,8 @@ class Interpreter {
     add_builtin(":",             Builtins.define);
     add_builtin("is!",           Builtins.define);
     add_builtin("is",            Builtins.careful_define);
+    add_builtin("def?",          Builtins.with_voc(vocabulary, Builtins.define_check_word));
+    add_builtin("undef",         Builtins.with_voc(vocabulary, Builtins.define_undefine));
 
     add_builtin("break",         Builtins.break_loop);
 
@@ -213,6 +215,7 @@ class Interpreter {
     // namespace
     add_builtin("ns",            Builtins.with_voc(vocabulary, Builtins.namespace_set));
     add_builtin("ns?",           Builtins.with_voc(vocabulary, Builtins.namespace_get));
+    add_builtin("ns-def?",       Builtins.with_voc(vocabulary, Builtins.namespace_check_defined));
     add_builtin("ns-words",      Builtins.with_voc(vocabulary, Builtins.namespace_words_list));
     add_builtin("words",         Builtins.with_voc(vocabulary, Builtins.namespace_cur_words));
 

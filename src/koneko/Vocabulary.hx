@@ -80,10 +80,27 @@ class Vocabulary {
   public function delete(key: String): Vocabulary {
     if( !this.exists(key) )
       return this;
-    if( this.voc.exists(in_current(key)) )
+
+    if( this.voc.exists(key) ) {
+      voc.remove(key);
+      return this;
+    }
+
+    if( this.voc.exists(in_current(key)) ) {
       voc.remove(in_current(key));
-    if( this.voc.exists(in_prelude(key)) )
+      return this;
+    }
+
+    if( this.voc.exists(in_prelude(key)) ) {
       voc.remove(in_prelude(key));
+      return this;
+    }
+
+    if( this.voc.exists(in_main(key)) ) {
+      voc.remove(in_main(key));
+      return this;
+    }
+
     return this;
   }
 
