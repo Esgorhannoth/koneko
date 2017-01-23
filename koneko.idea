@@ -50,11 +50,12 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] S N at
 * [ ] S upcase | uc  (manually for ascii and utf-8 cyrillic)
 * [ ] S downcase | dc
-* [ ] S backwards | backw (?)
-* [ ] to-str - convert TOS to string (via toString?)
-* [ ] S N substr (string pos)
-* [ ] S N N substr (string pos len)
-* [ ] S N N subrange (string pos end) [pos, end)
+* [v] S backwards | backw (?)
+* [v] to-str - convert TOS to string (via toString?)
+* [v] S N sub (string pos)
+* [v] S N N substr (string pos len)
+* [v] S N N subrange (string pos end) [pos, end)
+* [v] S string-length : len? in Prelude
 
 * chars as Int
 * [v] S N atc `c - code`
@@ -70,6 +71,7 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] Q n times
 
 * [v] words
+* [v] [A+] see (source)
 
 * [v] N quote - turns N values on stack into quote: 1 2 3 3 quote -> [1 2 3]
 * [v] unquote - turns quote on stack to sequence of values on stack: [1 2 3] -> 1 2 3

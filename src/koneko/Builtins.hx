@@ -7,6 +7,7 @@ using  koneko.StackItem; // for .type and .toString
 
 enum CompareOp { EQ; NQ; GT; LT; GE; LE; }
 enum LogicalOp { NOT; AND; OR; XOR; }
+enum SubstrVariant { SUB; SUBSTR; SUBRANGE; }
 
 /**
   All functions return either a valuable StackItem or Noop;
@@ -616,6 +617,15 @@ class Builtins {
     return Noop;
   }
 
+  public static function string_backwards(s: Stack): StackItem {
+    assert_has_one(s);
+    var str = unwrap_string( s.pop() );
+    var cps = utf8_to_chars(str);
+    cps.reverse();
+    s.push( StringSI( chars_to_utf8_string(cps) ) );
+    return Noop;
+  }
+
   public static function string_char_to_string(s: Stack): StackItem {
     assert_has_one(s);
     var cp = unwrap_int( s.pop() );
@@ -638,6 +648,73 @@ class Builtins {
     string_char_to_string(s);
     print(s);
     return Noop;
+  }
+
+  public static function string_length(s: Stack): StackItem {
+    assert_has_one(s);
+    var str = unwrap_string( s.pop() );
+    s.push( IntSI( haxe.Utf8.length(str)));
+    return Noop;
+  }
+
+  public static function string_substring_common(sv: SubstrVariant): Stack->StackItem {
+    return function(s: Stack): StackItem {
+      var pos: Int;
+      var len = 0;
+      var str: String;
+      var tos: StackItem;
+      var nos: StackItem;
+      var nchk = 3;  // number of stack items to check
+      if( sv == SUB ) nchk = 2;
+
+      assert_stack_has(s, nchk);
+      tos = s.pop();
+      if( nchk == 3 ) {
+        nos = s.pop();
+        pos = unwrap_int( nos );
+        len = unwrap_int( tos );
+      } else
+        pos = unwrap_int( tos );
+      var str = unwrap_string( s.pop() );
+      var cps = utf8_to_chars(str);
+
+      switch( sv ) {
+        case SUB      :
+          s.push( StringSI( chars_to_utf8_string( cps.slice(pos))));
+        case SUBSTR   :
+          // slice (pos, ?end);
+          var end : Int;
+          if( len < 0 ) len = 0; // if len is 0 - we'll return empty string
+          // if pos > 0 we should add len to get end index
+          // if pos < 0 we should subtract len from pos to get end index
+          if( pos > 0 ) end = pos + len;
+          else end = pos - len;
+          // for slice pos(=start) always must be lesser then end
+          if( pos > end ) {
+            swap_vars(pos, end);
+            // correct negative indices after swapping
+            // by moving them right >>
+            // we need to do this because original indices before swapping
+            // were [-pos, -end)
+            // After swapping they are [-end, -pos)
+            // That's not what we need, we need (-end, -pos]
+            // so we move them both right
+            if( pos < 0 ) { pos++; end++; }
+          }
+          s.push( StringSI( chars_to_utf8_string( cps.slice(pos, end))));
+        case SUBRANGE :
+          // here len is actually end
+          var end = len;
+          if( pos < 0 ) pos = 0;
+          if( end < 0 ) end = 0;
+          if( pos > end )
+            swap_vars(pos, end);
+          s.push( StringSI(
+                chars_to_utf8_string( cps.slice(pos, end))));
+      }
+
+      return Noop;
+    }
   }
 
   public static function string_to_string(s: Stack): StackItem {
@@ -1046,6 +1123,13 @@ class Builtins {
     return u.toString();
   }
 
+  static function utf8_to_chars(str: String): Array<Int> {
+    var cps = new Array<Int>();
+    for( i in 0 ... haxe.Utf8.length(str) )
+      cps.push( haxe.Utf8.charCodeAt(str, i) );
+    return cps;
+  }
+
   static function chars_to_utf8_string(chars: Array<Int>): String {
     // TODO
     var u = new haxe.Utf8();
@@ -1067,6 +1151,14 @@ class Builtins {
   public static function with_interp(interp: Interpreter, func: Stack -> Interpreter  -> StackItem) {
     return function(s: Stack): StackItem {
       return func(s, interp);
+    }
+  }
+
+  macro static function swap_vars(a: Expr, b: Expr): Expr {
+    return macro {
+      var tmp = $a;
+      $a = $b;
+      $b = tmp;
     }
   }
 }

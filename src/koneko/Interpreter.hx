@@ -153,8 +153,13 @@ class Interpreter {
     add_builtin(".tl",           Builtins.temp_stack_length);
 
     // Strings
+    add_builtin("string-length", Builtins.string_length);
     add_builtin("at",            Builtins.string_at);
     add_builtin("to-str",        Builtins.string_to_string);
+    add_builtin("sub",           Builtins.string_substring_common(SUB));
+    add_builtin("substr",        Builtins.string_substring_common(SUBSTR));
+    add_builtin("subrange",      Builtins.string_substring_common(SUBRANGE));
+    add_builtin("backw",         Builtins.string_backwards);
 
     add_builtin("atc",           Builtins.string_atc);
     add_builtin("emit",          Builtins.string_emit);

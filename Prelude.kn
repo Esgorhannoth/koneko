@@ -8,6 +8,7 @@
 [ "!Quote"  assert-type ] is assert-quote
 
 [print "\n" print] is say
+[string-length] is len?
 
 [1 negate] is true
 [0] is false
