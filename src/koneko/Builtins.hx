@@ -97,6 +97,16 @@ class Builtins {
     return Noop;
   }
 
+  public static function define_see_source(s: Stack, voc: Vocabulary): StackItem {
+    assert_has_one(s);
+    var q = unwrap_quote( s.pop() );
+    for( i in q ) {
+      var a = unwrap_atom(i);
+      say('${a}: ${voc.get_definition(a)}');
+    }
+    return Noop;
+  }
+
   public static function define_undefine(s: Stack, voc: Vocabulary): StackItem {
     assert_has_one(s);
     var q = unwrap_quote( s.pop() );
@@ -627,6 +637,13 @@ class Builtins {
   public static function string_emit(s: Stack): StackItem {
     string_char_to_string(s);
     print(s);
+    return Noop;
+  }
+
+  public static function string_to_string(s: Stack): StackItem {
+    assert_has_one(s);
+    var item = s.pop();
+    s.push( StringSI( item.toString() ) );
     return Noop;
   }
 

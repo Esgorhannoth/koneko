@@ -154,6 +154,7 @@ class Interpreter {
 
     // Strings
     add_builtin("at",            Builtins.string_at);
+    add_builtin("to-str",        Builtins.string_to_string);
 
     add_builtin("atc",           Builtins.string_atc);
     add_builtin("emit",          Builtins.string_emit);
@@ -211,6 +212,7 @@ class Interpreter {
     add_builtin("is",            Builtins.careful_define);
     add_builtin("def?",          Builtins.with_voc(vocabulary, Builtins.define_check_word));
     add_builtin("undef",         Builtins.with_voc(vocabulary, Builtins.define_undefine));
+    add_builtin("see",           Builtins.with_voc(vocabulary, Builtins.define_see_source));
 
     add_builtin("break",         Builtins.break_loop);
 

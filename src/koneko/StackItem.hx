@@ -46,7 +46,8 @@ class StackItems {
       case FloatSI   (f) : Std.string(f);
       // case StringSI  (s) : '"${s}"';
       case StringSI  (s) : '"${s.replace("\\n","\\\\n").replace("\\t","\\\\t")}"';
-      case AtomSI    (s) : '<A:${s}>';
+      // case AtomSI    (s) : '<A:${s}>';
+      case AtomSI    (s) : s;
       case DefAtomSI     : '"<DefAtom>"';
       case MaybeDefSI    : '"<MaybeDef>"';
       case QuoteSI   (q) :

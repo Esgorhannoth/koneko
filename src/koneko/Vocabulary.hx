@@ -1,5 +1,7 @@
 package koneko;
 
+using  koneko.StackItem;
+
 /**
   Contains mappings from atoms to array of `StackItem`s
 
@@ -96,7 +98,11 @@ class Vocabulary {
     return ( this.voc.exists(in_current(key) ));
   }
 
-  public function get(key: String): StackItem {
+  public function get(key: String, ?given_ns: String): StackItem {
+    // just get it
+    if( given_ns != null )
+      return voc.get('${given_ns}:${key}');
+
     // no such atom
     var ns = this.find_ns(key);
     if( ns == null )
@@ -150,6 +156,17 @@ class Vocabulary {
   // alias
   public inline function remove(key: String): Vocabulary {
     return this.delete(key);
+  }
+
+  public function get_definition(key: String): String {
+    var ns = find_ns(key);
+    if( null == ns )
+      return 'No such word ${key}';
+
+    if( ns == builtin_ns )
+      return '${key} is Builtin word';
+
+    return this.get(key, ns).toString();
   }
 
   public inline function keys(): Iterator<String> {
