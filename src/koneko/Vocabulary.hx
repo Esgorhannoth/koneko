@@ -8,10 +8,12 @@ package koneko;
   Other namespaces available only if used with `using`
   e.g. ["ns1" "ns2"] using
   Current ns is always available and has priority
+
   If a word is defined both in ns1 and ns2, ns2 version will be used,
   as word resolution goes right to left
   You can still get ns1 version with full name `ns1:word`
   So check order is from first to last with `['ns1' 'ns2'] using`:
+  - full-path check
   - current NS  <- first
   - ns2
   - ns1
@@ -62,12 +64,28 @@ class Vocabulary {
      e.g. if current NS is "File" this won't find "Dir:list" given as "list",
      but WILL find as "Dir:list"
    **/
-  // TODO need `using` version
   public function exists(key: String): Bool {
-    return (this.voc.exists(key) ||           // with NS
-        this.voc.exists(in_current(key)) ||   // in current NS
-        this.voc.exists(in_prelude(key)) ||   // in Prelude
-        this.voc.exists(in_builtins(key)));       // in Main
+    return find_ns(key) != null;
+  }
+
+  function find_ns(key: String): String {
+    // full name
+    if( this.voc.exists(key) ) {
+      var idx = key.indexOf(":");
+      return key.substr(idx);
+    }
+
+    if( this.voc.exists(in_current(key) ))   // in current NS
+      return current_ns;
+    for( ns in this.using_list )
+      if( this.voc.exists('${ns}:${key}') )
+        return ns;
+
+    if( this.voc.exists(in_prelude(key) ))   // in Prelude
+      return prelude_ns;
+    if( this.voc.exists(in_builtins(key) ))  // in Builtin
+      return builtin_ns;
+    return null; // does not exist TODO use haxe.ds.Option instead?
   }
 
   /**
@@ -78,24 +96,17 @@ class Vocabulary {
     return ( this.voc.exists(in_current(key) ));
   }
 
-  // TODO need `using` version
   public function get(key: String): StackItem {
     // no such atom
-    if( !this.exists(key) )
+    var ns = this.find_ns(key);
+    if( ns == null )
       return Noop;
 
-    // with namespace
+    // full name with namespace
     if( this.voc.exists(key) )
       return voc.get(key);
-    // in current namespace
-    if( this.voc.exists(in_current(key)) )
-      return voc.get(in_current(key));
-    // in Prelude
-    if( this.voc.exists(in_prelude(key)) )
-      return voc.get(in_prelude(key));
-    // in Main
-    if( this.voc.exists(in_builtins(key)) )
-      return voc.get(in_builtins(key));
+
+    return voc.get('${ns}:${key}');
     return Noop; // unreachable
   }
 
@@ -117,30 +128,21 @@ class Vocabulary {
   }
 
   // fluent
-  // TODO need `using` version
   public function delete(key: String): Vocabulary {
-    if( !this.exists(key) )
+    var ns = find_ns(key);
+    // no such word
+    if( ns == null )
       return this;
 
+    // full path with NS
     if( this.voc.exists(key) ) {
       voc.remove(key);
       return this;
     }
 
-    if( this.voc.exists(in_current(key)) ) {
-      voc.remove(in_current(key));
-      return this;
-    }
-
-    if( this.voc.exists(in_prelude(key)) ) {
-      voc.remove(in_prelude(key));
-      return this;
-    }
-
-    if( this.voc.exists(in_builtins(key)) ) {
-      voc.remove(in_builtins(key));
-      return this;
-    }
+    if( ns == builtin_ns )
+      throw "Cannot remove Builtin word";
+    voc.remove('${ns}:${key}');
 
     return this;
   }
@@ -162,7 +164,6 @@ class Vocabulary {
     return prelude_ns + ":" + key;
   }
 
-  // TODO ?? remove?
   public inline function in_builtins(key: String): String {
     return builtin_ns + ":" + key;
   }

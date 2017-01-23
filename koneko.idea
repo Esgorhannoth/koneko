@@ -120,10 +120,10 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] ns-def? - check if ns exists
 
 |17.0123.1036|
-* [ ] ["ns1" "ns2"] using : atoms check in right to left order, i.e. listed last, checked first
+* [v] ["ns1" "ns2"] using : atoms check in right to left order, i.e. listed last, checked first
        e.g. if we have File:open and Socket:open and ["File" "Socket"] using then `open` will result in Socket:open, fun full `File:open` will still execute File:open
-* [ ] 'Main' ns -> 'Builtin' ns : Builting available anywhere
-* [ ] ... and cannot be redefined (??)
+* [v] 'Main' ns -> 'Builtin' ns : Builting available anywhere
+* [v] ... and cannot be redefined (??)
 
 
 main objectives:
