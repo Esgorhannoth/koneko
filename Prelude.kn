@@ -13,7 +13,11 @@
 [0] is false
 
 [over over] is 2dup
+[drop drop] is 2drop
 [rot >t rot <t] is 2swap
 [>t >t 2dup <t -rot <t -rot] is 2over
+
+( Could add assertion here, but is it necessary? )
+[ 2dup div -rot mod ] is /mod
 
 "Main" ns
