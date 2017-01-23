@@ -592,6 +592,44 @@ class Builtins {
     return Noop;
   }
 
+  public static function string_atc(s: Stack): StackItem {
+    var item = s.pop();
+    var str = unwrap_string( s.pop() );
+    var n = unwrap_int(item);
+    try {
+      s.push(
+          IntSI(
+              haxe.Utf8.charCodeAt(str, n) ));
+    }
+    catch(e: Dynamic)
+      throw error("Index out of bounds");
+    return Noop;
+  }
+
+  public static function string_char_to_string(s: Stack): StackItem {
+    assert_has_one(s);
+    var cp = unwrap_int( s.pop() );
+    s.push( StringSI( char_to_utf8_string(cp) ) );
+    return Noop;
+  }
+
+  public static function string_chars_to_string(s: Stack): StackItem {
+    assert_has_one(s);
+    var q = unwrap_quote( s.pop() );
+    var cps = new Array<Int>();
+    for( i in q ) {
+      cps.push( unwrap_int(i) );
+    }
+    s.push( StringSI( chars_to_utf8_string(cps) ) );
+    return Noop;
+  }
+
+  public static function string_emit(s: Stack): StackItem {
+    string_char_to_string(s);
+    print(s);
+    return Noop;
+  }
+
   public static function subtract(s: Stack): StackItem {
     assert_stack_has(s, 2);
     var r = math_subtract(s);

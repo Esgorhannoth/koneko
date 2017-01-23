@@ -155,6 +155,12 @@ class Interpreter {
     // Strings
     add_builtin("at",            Builtins.string_at);
 
+    add_builtin("atc",           Builtins.string_atc);
+    add_builtin("emit",          Builtins.string_emit);
+    add_builtin("chr->str",      Builtins.string_char_to_string);
+    add_builtin("chars->str",    Builtins.string_chars_to_string);
+
+
     // Math
     add_builtin("+",             Builtins.add);
     add_builtin("-",             Builtins.subtract);
