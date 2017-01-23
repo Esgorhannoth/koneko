@@ -50,16 +50,17 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] S N at
 * [ ] S upcase | uc  (manually for ascii and utf-8 cyrillic)
 * [ ] S downcase | dc
-* [ ] S backwards | back (?)
+* [ ] S backwards | backw (?)
 * [ ] to-str - convert TOS to string (via toString?)
 * [ ] S N substr (string pos)
 * [ ] S N N substr (string pos len)
 * [ ] S N N subrange (string pos end) [pos, end)
 
-* [ ] S N atc `c - code`
 * [ ] chars as Int
+* [ ] S N atc `c - code`
 * [ ] chr->str - char (int) to utf8 string
 * [ ] chars->str - quote of chars (int) to utf8 string
+* [ ] C emit - print int-char
 
 - structured
 * [v] if: [true-br] [false-br] [cond] if :: -> [cond] [true] [false] if
@@ -117,6 +118,12 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] undef words that are no longer needed : [atom+] undef
 * [v] def?  - check if word is defined
 * [v] ns-def? - check if ns exists
+
+|17.0123.1036|
+* [ ] ["ns1" "ns2"] using : atoms check in right to left order, i.e. listed last, checked first
+       e.g. if we have File:open and Socket:open and ["File" "Socket"] using then `open` will result in Socket:open, fun full `File:open` will still execute File:open
+* [ ] 'Main' ns -> 'Builtin' ns : Builting available anywhere
+* [ ] ... and cannot be redefined (??)
 
 
 main objectives:

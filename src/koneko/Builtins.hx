@@ -37,7 +37,7 @@ class Builtins {
   }
 
   public static function assert_true(s: Stack): StackItem {
-    assert_stack_has(s, 1);
+    assert_has_one(s);
     var cond = unwrap_bool( s.pop() );
     if( !cond  )
       return BreakSI;
@@ -65,7 +65,7 @@ class Builtins {
 
   // C-
   public static function careful_define(s: Stack): StackItem {
-    check_underflow(s);
+    assert_has_one(s);
     return MaybeDefSI;
   }
 
@@ -76,12 +76,12 @@ class Builtins {
 
   // D-
   public static function define(s: Stack): StackItem {
-    check_underflow(s);
+    assert_has_one(s);
     return DefAtomSI;
   }
 
   public static function define_check_word(s: Stack, voc: Vocabulary): StackItem {
-    check_underflow(s);
+    assert_has_one(s);
     var q = unwrap_quote( s.pop() );
     if( q.length <=0 )
       throw error("No word to check in quote");
@@ -98,7 +98,7 @@ class Builtins {
   }
 
   public static function define_undefine(s: Stack, voc: Vocabulary): StackItem {
-    check_underflow(s);
+    assert_has_one(s);
     var q = unwrap_quote( s.pop() );
     try {
       for( a in q )
@@ -114,7 +114,7 @@ class Builtins {
   }
 
   public static function drop(s: Stack): StackItem {
-    assert_stack_has(s, 1);
+    assert_has_one(s);
     return s.pop();
   }
 
@@ -125,7 +125,7 @@ class Builtins {
   
   // I-
   public static function identity(s: Stack, interp: Interpreter): StackItem {
-    check_underflow(s);
+    assert_has_one(s);
     var item: StackItem = s.pop();
     switch( item ) {
       case QuoteSI   (q) : interp.eval(q, Eager);
@@ -221,7 +221,7 @@ class Builtins {
     return function(s: Stack): StackItem {
       switch( op ) {
         case NOT :
-          assert_stack_has(s, 1);
+          assert_has_one(s);
           var boolv = unwrap_bool(s.pop());
           s.push( do_logical_op(boolv, false, NOT) );
         case _   :
@@ -256,7 +256,7 @@ class Builtins {
   }
 
   public static function math_negate(s: Stack): StackItem {
-    check_underflow(s);
+    assert_has_one(s);
     var item = s.pop();
     switch( item ) {
       case IntSI(i)   : s.push( IntSI( -i ) );
@@ -267,7 +267,7 @@ class Builtins {
   }
 
   public static function math_random(s: Stack): StackItem {
-    check_underflow(s);
+    assert_has_one(s);
     var item = s.pop();
     s.push( IntSI( Std.random( unwrap_int(item) )));
     return Noop;
@@ -275,7 +275,7 @@ class Builtins {
 
   public static function math_rounding(func: Float->Int): Stack->StackItem {
     return function(s: Stack): StackItem {
-      check_underflow(s);
+      assert_has_one(s);
       var n = s.pop();
       s.push( switch( n ) {
         case IntSI(i)   : n;
@@ -303,13 +303,27 @@ class Builtins {
   }
 
   // N-
+  public static function namespace_active_nss(s: Stack, voc: Vocabulary): StackItem {
+    var nss = voc.using_list;
+    var sb = new StringBuf();
+    sb.add("< using:");
+    for( i in nss )
+      sb.add('  $i');
+    sb.add("  ");
+    sb.add(voc.current_ns);
+    sb.add(" >");
+    say(sb.toString());
+    return Noop;
+  }
+
+  // TODO with `using`
   public static function namespace_cur_words(s: Stack, voc: Vocabulary): StackItem {
     s.push( StringSI( voc.current_ns ) );
     return namespace_words_list(s, voc);
   }
 
   public static function namespace_check_defined(s: Stack, voc: Vocabulary): StackItem {
-    assert_stack_has(s, 1);
+    assert_has_one(s);
     var ns = unwrap_string( s.pop() );
     for( k in voc.keys() )
       if( k.startsWith(ns) ) {
@@ -327,14 +341,31 @@ class Builtins {
   }
 
   public static function namespace_set(s: Stack, voc: Vocabulary): StackItem {
-    assert_stack_has(s, 1);
+    assert_has_one(s);
     var ns = unwrap_string( s.pop() );
     voc.current_ns = ns;
     return Noop;
   }
 
+  public static function namespace_using(s: Stack, voc: Vocabulary): StackItem {
+    assert_has_one(s);
+    var item = s.pop();
+    var nss = new Array<String>();
+    switch( item ) {
+      case StringSI(s)   : nss.push(s);
+      case QuoteSI(q)    :
+        for( i in q )
+          nss.push( unwrap_string(i) );
+      case _             :
+      throw error('!String or !Quote of "!String"s expected for setting active namespaces, but ${item.type()} found');
+
+    }
+    voc.using_list = nss;
+    return Noop;
+  }
+
   public static function namespace_words_list(s: Stack, voc: Vocabulary): StackItem {
-    assert_stack_has(s, 1);
+    assert_has_one(s);
     var ns = unwrap_string( s.pop() );
     var ns_len = ns.length + 1; // eat ":"
 
@@ -362,7 +393,7 @@ class Builtins {
 
   // P-
   public static function pick(s: Stack): StackItem {
-    check_underflow(s);
+    assert_has_one(s);
     var item = s.pop();
     var idx = switch( item ) {
       case IntSI(i) : i;
@@ -373,14 +404,14 @@ class Builtins {
   }
 
   public static function pop_and_print(s: Stack): StackItem {
-    check_underflow(s);
+    assert_has_one(s);
     out(s.pop().toString());
     out(" ");
     return Noop;
   }
 
   public static function pop_from_quote(s: Stack): StackItem {
-    assert_stack_has(s, 1);
+    assert_has_one(s);
     var q = unwrap_quote( s.pop() );
     if( q.length < 1 )
       throw error("Cannot get last element from empty quote");
@@ -392,7 +423,7 @@ class Builtins {
   }
 
   public static function print(s: Stack): StackItem {
-    check_underflow(s);
+    assert_has_one(s);
     var el = s.pop();
     out( 
         switch( el ) {
@@ -431,7 +462,7 @@ class Builtins {
   public static function quit_with(s: Stack): StackItem {
     var code = 0; // default
     try {
-      check_underflow(s);
+      assert_has_one(s);
       var item = s.pop();
       code = switch( item ) {
         case IntSI(i) : i;
@@ -470,7 +501,7 @@ class Builtins {
   }
 
   public static function reverse_quote(s: Stack): StackItem {
-    assert_stack_has(s, 1);
+    assert_has_one(s);
     var q = unwrap_quote( s.pop() );
     q.reverse();
     s.push( QuoteSI(q) );
@@ -501,7 +532,7 @@ class Builtins {
 
   // S-
   public static function shift_from_quote(s: Stack): StackItem {
-    assert_stack_has(s, 1);
+    assert_has_one(s);
     var q = unwrap_quote( s.pop() );
     if( q.length < 1 )
       throw error("Cannot get first element from empty quote");
@@ -533,7 +564,7 @@ class Builtins {
   }
 
   public static function sleep(s: Stack): StackItem {
-    check_underflow(s);
+    assert_has_one(s);
     switch( s.pop() ) {
       case IntSI(i) : Sys.sleep(i);
       case _        : throw KonekoException.IncompatibleTypes;
@@ -585,12 +616,12 @@ class Builtins {
   }
 
   public static function temp_stack_pop(s: Stack): StackItem {
-    assert_stack_has(s.tmp, 1);
+    assert_has_one(s.tmp);
     s.push( s.tmp.pop() );
     return Noop;
   }
   public static function temp_stack_push(s: Stack): StackItem {
-    assert_stack_has(s, 1);
+    assert_has_one(s);
     s.tmp.push( s.pop() );
     return Noop;
   }
@@ -614,7 +645,7 @@ class Builtins {
   }
 
   public static function type(s: Stack): StackItem {
-    check_underflow(s);
+    assert_has_one(s);
     var item = s.pop();
     s.push( StringSI( item.type() ) );
     return Noop;
@@ -622,7 +653,7 @@ class Builtins {
 
   // U-
   public static function unquote_to_values(s: Stack): StackItem {
-    assert_stack_has(s, 1);
+    assert_has_one(s);
     var q = unwrap_quote( s.pop() );
     for( i in q )
       s.push( i );
@@ -658,7 +689,7 @@ class Builtins {
   }
 
   public static function while_loop(s: Stack, interp: Interpreter): StackItem {
-    assert_stack_has(s, 1);
+    assert_has_one(s);
     var body = s.pop();
     assert_is(body, "!Quote");
     do {
@@ -724,7 +755,7 @@ class Builtins {
     Sys.println(v);
   }
 
-  static function check_underflow(s: Stack) {
+  static function assert_has_one(s: Stack) {
     if( s.is_empty() )
       throw KonekoException.StackUnderflow;
   }
@@ -951,6 +982,13 @@ class Builtins {
       case NOT: !a;
     }
     return IntSI( r == true ? -1 : 0 );
+  }
+
+  static function char_to_utf8_string(char: Int): String {
+    // TODO
+    var u = new haxe.Utf8();
+    u.addChar(char);
+    return u.toString();
   }
 
   static function chars_to_utf8_string(chars: Array<Int>): String {

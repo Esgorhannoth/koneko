@@ -18,8 +18,8 @@ class Interpreter {
   public var stack      (default, null): Stack;
 
 
-  public function new() {
-    this.vocabulary = new Vocabulary("Prelude");
+  public function new(?main_ns: String, ?prelude_ns: String) {
+    this.vocabulary = new Vocabulary(main_ns, prelude_ns); // "Main" and "Prelude" as default
     this.stack      = new Stack(true); // with temporary stack inside
     init_builtins();
   }
@@ -218,6 +218,8 @@ class Interpreter {
     add_builtin("ns-def?",       Builtins.with_voc(vocabulary, Builtins.namespace_check_defined));
     add_builtin("ns-words",      Builtins.with_voc(vocabulary, Builtins.namespace_words_list));
     add_builtin("words",         Builtins.with_voc(vocabulary, Builtins.namespace_cur_words));
+    add_builtin("using",         Builtins.with_voc(vocabulary, Builtins.namespace_using));
+    add_builtin("active-nss",    Builtins.with_voc(vocabulary, Builtins.namespace_active_nss));
 
     // Exiting
     add_builtin("quit/with",     Builtins.quit_with);
@@ -231,7 +233,7 @@ class Interpreter {
   }
 
   inline function add_builtin(key: String, builtin: Stack->StackItem) {
-    return vocabulary.add(key, BuiltinSI(builtin));
+    return vocabulary.add_builtin(key, BuiltinSI(builtin));
   }
 
 
