@@ -626,6 +626,36 @@ class Builtins {
     return Noop;
   }
 
+  public static function string_case_lower(s: Stack): StackItem {
+    assert_has_one(s);
+    var str = unwrap_string( s.pop() );
+    var cps = utf8_to_chars( str );
+    var lc = cps.map(function(c: Int): Int {
+      return switch( c ) {
+        case 1025: 1105; // ё -> Ё
+        case i if( valid_for_lowercase(c) ) : i + 32;
+        case _: c;
+      }
+    });
+    s.push( StringSI( chars_to_utf8_string(lc)));
+    return Noop;
+  }
+
+  public static function string_case_upper(s: Stack): StackItem {
+    assert_has_one(s);
+    var str = unwrap_string( s.pop() );
+    var cps = utf8_to_chars( str );
+    var uc = cps.map(function(c: Int): Int {
+      return switch( c ) {
+        case 1105: 1025; // ё -> Ё
+        case i if( valid_for_uppercase(c) ) : i - 32;
+        case _: c;
+      }
+    });
+    s.push( StringSI( chars_to_utf8_string(uc)));
+    return Noop;
+  }
+
   public static function string_char_to_string(s: Stack): StackItem {
     assert_has_one(s);
     var cp = unwrap_int( s.pop() );
@@ -1136,6 +1166,18 @@ class Builtins {
     for ( i in chars )
       u.addChar(i);
     return u.toString();
+  }
+
+  static function valid_for_uppercase(c: Int): Bool {
+    // 65-90, 97-122 ascii, 1040-1071, 1072-1103, 1025+1105(80 diff)
+    return (c >= 97 && c <= 122) || // ascii lower
+      (c >= 1072 && c <= 1103);     // utf-8 cyrillic lower
+  }
+
+  static function valid_for_lowercase(c: Int): Bool {
+    // 65-90, 97-122 ascii, 1040-1071, 1072-1103, 1025+1105(80 diff)
+    return (c >= 65 && c <= 90) || // ascii upper
+      (c >= 1040 && c <= 1071);     // utf-8 cyrillic upper
   }
 
   /**

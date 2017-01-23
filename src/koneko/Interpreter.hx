@@ -160,6 +160,8 @@ class Interpreter {
     add_builtin("substr",        Builtins.string_substring_common(SUBSTR));
     add_builtin("subrange",      Builtins.string_substring_common(SUBRANGE));
     add_builtin("backw",         Builtins.string_backwards);
+    add_builtin("uc",            Builtins.string_case_upper);
+    add_builtin("lc",            Builtins.string_case_lower);
 
     add_builtin("atc",           Builtins.string_atc);
     add_builtin("emit",          Builtins.string_emit);

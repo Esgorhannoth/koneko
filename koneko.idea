@@ -48,8 +48,8 @@ x stack item has it's type as string for generic isOf(type: String) function
 
 - strings:
 * [v] S N at
-* [ ] S upcase | uc  (manually for ascii and utf-8 cyrillic)
-* [ ] S downcase | dc
+* [v] S upcase | uc  (manually for ascii and utf-8 cyrillic)
+* [v] S downcase | dc
 * [v] S backwards | backw (?)
 * [v] to-str - convert TOS to string (via toString?)
 * [v] S N sub (string pos)
