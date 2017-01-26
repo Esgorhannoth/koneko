@@ -206,6 +206,7 @@ class Interpreter {
     add_builtin("<q",            Builtins.shift_from_quote);
     add_builtin("q>",            Builtins.pop_from_quote);
     add_builtin("reverse",       Builtins.reverse_quote);
+    add_builtin("concat",        Builtins.concat_quotes);
 
     // looping and branching
     add_builtin("if",            Builtins.with_interp(this, Builtins.if_conditional));

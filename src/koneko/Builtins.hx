@@ -75,6 +75,15 @@ class Builtins {
     return Noop;
   }
 
+  public static function concat_quotes(s: Stack): StackItem {
+    assert_stack_has(s, 2);
+    var item = s.pop();
+    var first = unwrap_quote( s.pop() );
+    var second = unwrap_quote( item );
+    s.push( QuoteSI( first.concat(second) ) );
+    return Noop;
+  }
+
   // D-
   public static function define(s: Stack): StackItem {
     assert_has_one(s);

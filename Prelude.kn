@@ -12,6 +12,7 @@
 
 [1 negate] is true
 [0] is false
+[swap not swap when] is unless
 
 [over over] is 2dup
 [drop drop] is 2drop
@@ -20,5 +21,10 @@
 
 ( Could add assertion here, but is it necessary? )
 [ 2dup div -rot mod ] is /mod
+[ 2 / ] is 2/
+
+( from to -- [from .. to] )
+[ >t 0 quote swap [ dup >t q< <t 1 + ] <t times drop ]
+is range
 
 "Main" ns

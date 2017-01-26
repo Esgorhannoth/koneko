@@ -127,6 +127,10 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] 'Main' ns -> 'Builtin' ns : Builting available anywhere
 * [v] ... and cannot be redefined (??)
 
+|17.0126.1254|
+* [ ] modules - static functions Stack->StackItem that export words and can be `load`ed
+* [ ] `load`
+
 
 main objectives:
 . [v] InputStream (inst'ed via Lexer)
