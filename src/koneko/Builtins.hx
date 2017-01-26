@@ -1,6 +1,7 @@
 package koneko;
 
 import haxe.macro.Expr;
+import koneko.Helpers as H;
 
 using  StringTools;
 using  koneko.StackItem; // for .type and .toString
@@ -18,7 +19,7 @@ class Builtins {
 
   // A-
   public static function add(s: Stack): StackItem {
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     var r = math_add(s);
     switch( r ) {
       case Noop : return Noop;
@@ -38,19 +39,19 @@ class Builtins {
   }
 
   public static function assert_true(s: Stack): StackItem {
-    assert_has_one(s);
-    var cond = unwrap_bool( s.pop() );
+    H.assert_has_one(s);
+    var cond = H.unwrap_bool( s.pop() );
     if( !cond  )
       return BreakSI;
     return Noop;
   }
 
   public static function assert_true_msg(s: Stack): StackItem {
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     var item = s.pop();
     var b    = s.pop();
-    var msg  = unwrap_string(item);
-    var cond = unwrap_bool(b);
+    var msg  = H.unwrap_string(item);
+    var cond = H.unwrap_bool(b);
     if( !cond ) {
       out("Failed: ");
       say(msg);
@@ -66,7 +67,7 @@ class Builtins {
 
   // C-
   public static function careful_define(s: Stack): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     return MaybeDefSI;
   }
 
@@ -76,30 +77,30 @@ class Builtins {
   }
 
   public static function concat_quotes(s: Stack): StackItem {
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     var item = s.pop();
-    var first = unwrap_quote( s.pop() );
-    var second = unwrap_quote( item );
+    var first = H.unwrap_quote( s.pop() );
+    var second = H.unwrap_quote( item );
     s.push( QuoteSI( first.concat(second) ) );
     return Noop;
   }
 
   // D-
   public static function define(s: Stack): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     return DefAtomSI;
   }
 
   public static function define_check_word(s: Stack, voc: Vocabulary): StackItem {
-    assert_has_one(s);
-    var q = unwrap_quote( s.pop() );
+    H.assert_has_one(s);
+    var q = H.unwrap_quote( s.pop() );
     if( q.length <=0 )
-      throw error("No word to check in quote");
+      throw H.error("No word to check in quote");
     if( q.length > 1 )
-      throw error("Cannot check more then 1 word");
+      throw H.error("Cannot check more then 1 word");
     var atom = q.shift();
-    assert_is(atom, "!Atom");
-    var key = unwrap_atom(atom);
+    H.assert_is(atom, "!Atom");
+    var key = H.unwrap_atom(atom);
     if( voc.exists(key) )
       s.push( IntSI( -1 ) ); //true
     else
@@ -108,33 +109,33 @@ class Builtins {
   }
 
   public static function define_see_source(s: Stack, voc: Vocabulary): StackItem {
-    assert_has_one(s);
-    var q = unwrap_quote( s.pop() );
+    H.assert_has_one(s);
+    var q = H.unwrap_quote( s.pop() );
     for( i in q ) {
-      var a = unwrap_atom(i);
+      var a = H.unwrap_atom(i);
       say('${a}: ${voc.get_definition(a)}');
     }
     return Noop;
   }
 
   public static function define_undefine(s: Stack, voc: Vocabulary): StackItem {
-    assert_has_one(s);
-    var q = unwrap_quote( s.pop() );
+    H.assert_has_one(s);
+    var q = H.unwrap_quote( s.pop() );
     try {
       for( a in q )
-        assert_is(a, "!Atom");
+        H.assert_is(a, "!Atom");
     }
     catch(e: Dynamic) {
-      throw error("Non-atom in undef list");
+      throw H.error("Non-atom in undef list");
     }
     for( a in q ) {
-      voc.remove( unwrap_atom(a) );
+      voc.remove( H.unwrap_atom(a) );
     }
     return Noop;
   }
 
   public static function drop(s: Stack): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     return s.pop();
   }
 
@@ -145,18 +146,18 @@ class Builtins {
   
   // I-
   public static function identity(s: Stack, interp: Interpreter): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     var item: StackItem = s.pop();
     switch( item ) {
       case QuoteSI   (q) : interp.eval(q, Eager);
       case IntSI     (_) | FloatSI(_) | StringSI(_) : s.push(item);
-      case ErrSI     (e) : throw error(e);
+      case ErrSI     (e) : throw H.error(e);
       case BreakSI       : s.push(item); // or throw?
 
-      case AtomSI    (s) : throw error('How did atom ${s} get here? 0.o');
-      case DefAtomSI     : throw error('How did defatom get here? 0.o');
-      case MaybeDefSI    : throw error('How did maybedef get here? 0.o');
-      case BuiltinSI (_) : throw error('How did builting get here? 0.o');
+      case AtomSI    (s) : throw H.error('How did atom ${s} get here? 0.o');
+      case DefAtomSI     : throw H.error('How did defatom get here? 0.o');
+      case MaybeDefSI    : throw H.error('How did maybedef get here? 0.o');
+      case BuiltinSI (_) : throw H.error('How did builting get here? 0.o');
       case Noop          : // do nothing
       case PartQuoteSI(_): // should not meet at all
     } // switch
@@ -164,22 +165,30 @@ class Builtins {
   }
 
   public static function if_conditional(s: Stack, interp: Interpreter): StackItem {
-    assert_stack_has(s, 3);
+    H.assert_stack_has(s, 3);
     var else_br = s.pop();
     var then_br = s.pop();
     var cond = s.pop();
-    assert_is(else_br, "!Quote");
-    assert_is(then_br, "!Quote");
+    H.assert_is(else_br, "!Quote");
+    H.assert_is(then_br, "!Quote");
     interp.eval_item(cond, Eager);
     var r = s.pop(); // supposedly from evaluation of `cond`
     switch( r ) {
       case IntSI(i) :
         if( i == 0 ) interp.eval_item(else_br, Eager) else interp.eval_item(then_br, Eager);
       case _        :
-        throw error('Condition for IF should leave !Int value on the stack. Found ${r.type()}');
+        throw H.error('Condition for IF should leave !Int value on the stack. Found ${r.type()}');
     }
     return Noop;
   }
+
+  // L-
+  public static function load_module(s: Stack, voc: Vocabulary): StackItem {
+    H.assert_has_one(s);
+    var fname = H.unwrap_string( s.pop() );
+    voc = ModLoader.add_to(voc, fname);
+    return Noop;
+  };
 
   // M-
   public static function math_compare(op: CompareOp): Stack->StackItem {
@@ -192,17 +201,17 @@ class Builtins {
 
       // Both Strings
       if( l_type == "!String" && r_type == "!String" ) {
-        r = do_compare(unwrap_string(left), unwrap_string(right), op);
+        r = do_compare(H.unwrap_string(left), H.unwrap_string(right), op);
       }
 
       // Both Ints
       else if( l_type == "!Int" && r_type == "!Int" ) {
-        r = do_compare(unwrap_int(left), unwrap_int(right), op);
+        r = do_compare(H.unwrap_int(left), H.unwrap_int(right), op);
       }
 
       // Each must be either Int or Float
       else {
-        r = do_compare(unwrap_float(left), unwrap_float(right), op);
+        r = do_compare(H.unwrap_float(left), H.unwrap_float(right), op);
       }
       if( r == true )
         s.push( IntSI(1) );
@@ -214,11 +223,11 @@ class Builtins {
   }
 
   public static function math_division(s: Stack): StackItem {
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     var tos = s.pop();
     var nos = s.pop();
-    var dsor = unwrap_float(tos);
-    var dend = unwrap_float(nos);
+    var dsor = H.unwrap_float(tos);
+    var dend = H.unwrap_float(nos);
     if( dsor == 0 )
       throw KonekoException.DivisionByZero;
     s.push( FloatSI( dend / dsor ) );
@@ -226,11 +235,11 @@ class Builtins {
   }
 
   public static function math_int_division(s: Stack): StackItem {
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     var tos = s.pop();
     var nos = s.pop();
-    var dsor = unwrap_float(tos);
-    var dend = unwrap_float(nos);
+    var dsor = H.unwrap_float(tos);
+    var dend = H.unwrap_float(nos);
     if( dsor == 0 )
       throw KonekoException.DivisionByZero;
     s.push( IntSI( Math.floor(dend / dsor) ) );
@@ -241,33 +250,33 @@ class Builtins {
     return function(s: Stack): StackItem {
       switch( op ) {
         case NOT :
-          assert_has_one(s);
-          var boolv = unwrap_bool(s.pop());
+          H.assert_has_one(s);
+          var boolv = H.unwrap_bool(s.pop());
           s.push( do_logical_op(boolv, false, NOT) );
         case _   :
-          assert_stack_has(s, 2);
+          H.assert_stack_has(s, 2);
           var tos = s.pop();
           var nos = s.pop();
-          var left = unwrap_bool(nos);
-          var right = unwrap_bool(tos);
+          var left = H.unwrap_bool(nos);
+          var right = H.unwrap_bool(tos);
           s.push( do_logical_op(left, right, op) );
       } // switch
       return Noop;
     }
   }
   public static function math_modulo(s: Stack): StackItem {
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     var tos = s.pop();
     var nos = s.pop();
     if( tos.type() == "!Int" && nos.type() == "!Int" ) {
-      var dend = unwrap_int(nos);
-      var dsor = unwrap_int(tos);
+      var dend = H.unwrap_int(nos);
+      var dsor = H.unwrap_int(tos);
       if( dsor == 0 )
         throw KonekoException.DivisionByZero;
       s.push( IntSI( dend % dsor ) );
     } else {
-      var dend = unwrap_float(nos);
-      var dsor = unwrap_float(tos);
+      var dend = H.unwrap_float(nos);
+      var dsor = H.unwrap_float(tos);
       if( dsor == 0 )
         throw KonekoException.DivisionByZero;
       s.push( FloatSI( dend % dsor ) );
@@ -276,7 +285,7 @@ class Builtins {
   }
 
   public static function math_negate(s: Stack): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     var item = s.pop();
     switch( item ) {
       case IntSI(i)   : s.push( IntSI( -i ) );
@@ -287,20 +296,20 @@ class Builtins {
   }
 
   public static function math_random(s: Stack): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     var item = s.pop();
-    s.push( IntSI( Std.random( unwrap_int(item) )));
+    s.push( IntSI( Std.random( H.unwrap_int(item) )));
     return Noop;
   }
 
   public static function math_rounding(func: Float->Int): Stack->StackItem {
     return function(s: Stack): StackItem {
-      assert_has_one(s);
+      H.assert_has_one(s);
       var n = s.pop();
       s.push( switch( n ) {
         case IntSI(i)   : n;
         case FloatSI(f) : IntSI(func(f));
-        case _          : throw error("!Int or !Float expected");
+        case _          : throw H.error("!Int or !Float expected");
       });
       return Noop;
     }
@@ -312,7 +321,7 @@ class Builtins {
   }
 
   public static function multiply(s: Stack): StackItem {
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     var r = math_multiply(s);
     switch( r ) {
       case Noop : return Noop;
@@ -343,8 +352,8 @@ class Builtins {
   }
 
   public static function namespace_check_defined(s: Stack, voc: Vocabulary): StackItem {
-    assert_has_one(s);
-    var ns = unwrap_string( s.pop() );
+    H.assert_has_one(s);
+    var ns = H.unwrap_string( s.pop() );
     for( k in voc.keys() )
       if( k.startsWith(ns) ) {
         s.push( IntSI( -1 ) ); // true
@@ -361,23 +370,23 @@ class Builtins {
   }
 
   public static function namespace_set(s: Stack, voc: Vocabulary): StackItem {
-    assert_has_one(s);
-    var ns = unwrap_string( s.pop() );
+    H.assert_has_one(s);
+    var ns = H.unwrap_string( s.pop() );
     voc.current_ns = ns;
     return Noop;
   }
 
   public static function namespace_using(s: Stack, voc: Vocabulary): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     var item = s.pop();
     var nss = new Array<String>();
     switch( item ) {
       case StringSI(s)   : nss.push(s);
       case QuoteSI(q)    :
         for( i in q )
-          nss.push( unwrap_string(i) );
+          nss.push( H.unwrap_string(i) );
       case _             :
-      throw error('!String or !Quote of "!String"s expected for setting active namespaces, but ${item.type()} found');
+      throw H.error('!String or !Quote of "!String"s expected for setting active namespaces, but ${item.type()} found');
 
     }
     voc.using_list = nss;
@@ -385,8 +394,8 @@ class Builtins {
   }
 
   public static function namespace_words_list(s: Stack, voc: Vocabulary): StackItem {
-    assert_has_one(s);
-    var ns = unwrap_string( s.pop() );
+    H.assert_has_one(s);
+    var ns = H.unwrap_string( s.pop() );
     var ns_len = ns.length + 1; // eat ":"
 
     var words = new Array<String>();
@@ -406,35 +415,35 @@ class Builtins {
 
   // O-
   public static function over(s: Stack): StackItem {
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     s.push( s.nos() );
     return Noop;
   }
 
   // P-
   public static function pick(s: Stack): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     var item = s.pop();
     var idx = switch( item ) {
       case IntSI(i) : i;
-      case _        : throw error('Incompatible index type : ${item.type()}');
+      case _        : throw H.error('Incompatible index type : ${item.type()}');
     }
-    s.push( nth(s, idx).value );
+    s.push( H.nth(s, idx).value );
     return Noop;
   }
 
   public static function pop_and_print(s: Stack): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     out(s.pop().toString());
     out(" ");
     return Noop;
   }
 
   public static function pop_from_quote(s: Stack): StackItem {
-    assert_has_one(s);
-    var q = unwrap_quote( s.pop() );
+    H.assert_has_one(s);
+    var q = H.unwrap_quote( s.pop() );
     if( q.length < 1 )
-      throw error("Cannot get last element from empty quote");
+      throw H.error("Cannot get last element from empty quote");
     var v = q.pop();
     s.push( QuoteSI(q) );
     s.push( v );
@@ -443,7 +452,7 @@ class Builtins {
   }
 
   public static function print(s: Stack): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     var el = s.pop();
     out( 
         switch( el ) {
@@ -465,9 +474,9 @@ class Builtins {
 
   public static function push_to_quote(s: Stack): StackItem {
     // [Q] V q<
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     var v = s.pop();
-    var q = unwrap_quote( s.pop() );
+    var q = H.unwrap_quote( s.pop() );
     q.push(v);
     s.push(QuoteSI(q));
     return Noop;
@@ -482,12 +491,12 @@ class Builtins {
   public static function quit_with(s: Stack): StackItem {
     var code = 0; // default
     try {
-      assert_has_one(s);
+      H.assert_has_one(s);
       var item = s.pop();
       code = switch( item ) {
         case IntSI(i) : i;
         case _        :
-          throw error('Exit code must be !Int, got ${item.type()}');
+          throw H.error('Exit code must be !Int, got ${item.type()}');
           255;
       }
     } catch(e: Dynamic) {
@@ -499,9 +508,9 @@ class Builtins {
 
   public static function quote_values(s: Stack): StackItem {
     var item = s.pop();
-    assert_is(item, "!Int");
-    var n = unwrap_int(item);
-    assert_stack_has(s, n);
+    H.assert_is(item, "!Int");
+    var n = H.unwrap_int(item);
+    H.assert_stack_has(s, n);
     var a = new Array<StackItem>();
     for( i in 0 ... n )
       a.unshift(s.pop());
@@ -521,8 +530,8 @@ class Builtins {
   }
 
   public static function reverse_quote(s: Stack): StackItem {
-    assert_has_one(s);
-    var q = unwrap_quote( s.pop() );
+    H.assert_has_one(s);
+    var q = H.unwrap_quote( s.pop() );
     q.reverse();
     s.push( QuoteSI(q) );
     return Noop;
@@ -530,9 +539,9 @@ class Builtins {
 
   // -rot : 1 2 3 -> 3 1 2
   public static function rotate_1to3(s: Stack): StackItem {
-    var tmp: StackCell = nth(s, 0); // save TOS
-    var nos: StackCell = nth(s, 1);
-    var trd: StackCell = nth(s, 2);
+    var tmp: StackCell = H.nth(s, 0); // save TOS
+    var nos: StackCell = H.nth(s, 1);
+    var trd: StackCell = H.nth(s, 2);
     s.head = nos;          // make NOS new TOS
     tmp.next = trd.next;   // make old TOS point to trd's next
     trd.next = tmp;        // make trd point to old TOS
@@ -541,9 +550,9 @@ class Builtins {
 
   // rot : 1 2 3 -> 2 3 1
   public static function rotate_3to1(s: Stack): StackItem {
-    var tos: StackCell = nth(s, 0); // save TOS
-    var nos: StackCell = nth(s, 1);
-    var trd: StackCell = nth(s, 2);
+    var tos: StackCell = H.nth(s, 0); // save TOS
+    var nos: StackCell = H.nth(s, 1);
+    var trd: StackCell = H.nth(s, 2);
     s.head = trd;          // make TRD new TOS
     nos.next = trd.next;   // make NOS point to TRD's next
     trd.next = tos;        // make new TOS point to old TOS
@@ -552,10 +561,10 @@ class Builtins {
 
   // S-
   public static function shift_from_quote(s: Stack): StackItem {
-    assert_has_one(s);
-    var q = unwrap_quote( s.pop() );
+    H.assert_has_one(s);
+    var q = H.unwrap_quote( s.pop() );
     if( q.length < 1 )
-      throw error("Cannot get first element from empty quote");
+      throw H.error("Cannot get first element from empty quote");
     var v = q.shift();
     s.push( QuoteSI(q) );
     s.push( v );
@@ -584,7 +593,7 @@ class Builtins {
   }
 
   public static function sleep(s: Stack): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     switch( s.pop() ) {
       case IntSI(i) : Sys.sleep(i);
       case _        : throw KonekoException.IncompatibleTypes;
@@ -599,87 +608,87 @@ class Builtins {
 
   public static function string_at(s: Stack): StackItem {
     var item = s.pop();
-    var str = unwrap_string( s.pop() );
-    var n = unwrap_int(item);
+    var str = H.unwrap_string( s.pop() );
+    var n = H.unwrap_int(item);
     try {
       s.push(
           StringSI(
-            chars_to_utf8_string(
+            H.chars_to_utf8_string(
               [haxe.Utf8.charCodeAt(str, n)] )));
     }
     catch(e: Dynamic)
-      throw error("Index out of bounds");
+      throw H.error("Index out of bounds");
     return Noop;
   }
 
   public static function string_atc(s: Stack): StackItem {
     var item = s.pop();
-    var str = unwrap_string( s.pop() );
-    var n = unwrap_int(item);
+    var str = H.unwrap_string( s.pop() );
+    var n = H.unwrap_int(item);
     try {
       s.push(
           IntSI(
               haxe.Utf8.charCodeAt(str, n) ));
     }
     catch(e: Dynamic)
-      throw error("Index out of bounds");
+      throw H.error("Index out of bounds");
     return Noop;
   }
 
   public static function string_backwards(s: Stack): StackItem {
-    assert_has_one(s);
-    var str = unwrap_string( s.pop() );
-    var cps = utf8_to_chars(str);
+    H.assert_has_one(s);
+    var str = H.unwrap_string( s.pop() );
+    var cps = H.utf8_to_chars(str);
     cps.reverse();
-    s.push( StringSI( chars_to_utf8_string(cps) ) );
+    s.push( StringSI( H.chars_to_utf8_string(cps) ) );
     return Noop;
   }
 
   public static function string_case_lower(s: Stack): StackItem {
-    assert_has_one(s);
-    var str = unwrap_string( s.pop() );
-    var cps = utf8_to_chars( str );
+    H.assert_has_one(s);
+    var str = H.unwrap_string( s.pop() );
+    var cps = H.utf8_to_chars( str );
     var lc = cps.map(function(c: Int): Int {
       return switch( c ) {
         case 1025: 1105; // ё -> Ё
-        case i if( valid_for_lowercase(c) ) : i + 32;
+        case i if( H.valid_for_lowercase(c) ) : i + 32;
         case _: c;
       }
     });
-    s.push( StringSI( chars_to_utf8_string(lc)));
+    s.push( StringSI( H.chars_to_utf8_string(lc)));
     return Noop;
   }
 
   public static function string_case_upper(s: Stack): StackItem {
-    assert_has_one(s);
-    var str = unwrap_string( s.pop() );
-    var cps = utf8_to_chars( str );
+    H.assert_has_one(s);
+    var str = H.unwrap_string( s.pop() );
+    var cps = H.utf8_to_chars( str );
     var uc = cps.map(function(c: Int): Int {
       return switch( c ) {
         case 1105: 1025; // ё -> Ё
-        case i if( valid_for_uppercase(c) ) : i - 32;
+        case i if( H.valid_for_uppercase(c) ) : i - 32;
         case _: c;
       }
     });
-    s.push( StringSI( chars_to_utf8_string(uc)));
+    s.push( StringSI( H.chars_to_utf8_string(uc)));
     return Noop;
   }
 
   public static function string_char_to_string(s: Stack): StackItem {
-    assert_has_one(s);
-    var cp = unwrap_int( s.pop() );
-    s.push( StringSI( char_to_utf8_string(cp) ) );
+    H.assert_has_one(s);
+    var cp = H.unwrap_int( s.pop() );
+    s.push( StringSI( H.char_to_utf8_string(cp) ) );
     return Noop;
   }
 
   public static function string_chars_to_string(s: Stack): StackItem {
-    assert_has_one(s);
-    var q = unwrap_quote( s.pop() );
+    H.assert_has_one(s);
+    var q = H.unwrap_quote( s.pop() );
     var cps = new Array<Int>();
     for( i in q ) {
-      cps.push( unwrap_int(i) );
+      cps.push( H.unwrap_int(i) );
     }
-    s.push( StringSI( chars_to_utf8_string(cps) ) );
+    s.push( StringSI( H.chars_to_utf8_string(cps) ) );
     return Noop;
   }
 
@@ -690,8 +699,8 @@ class Builtins {
   }
 
   public static function string_length(s: Stack): StackItem {
-    assert_has_one(s);
-    var str = unwrap_string( s.pop() );
+    H.assert_has_one(s);
+    var str = H.unwrap_string( s.pop() );
     s.push( IntSI( haxe.Utf8.length(str)));
     return Noop;
   }
@@ -706,20 +715,20 @@ class Builtins {
       var nchk = 3;  // number of stack items to check
       if( sv == SUB ) nchk = 2;
 
-      assert_stack_has(s, nchk);
+      H.assert_stack_has(s, nchk);
       tos = s.pop();
       if( nchk == 3 ) {
         nos = s.pop();
-        pos = unwrap_int( nos );
-        len = unwrap_int( tos );
+        pos = H.unwrap_int( nos );
+        len = H.unwrap_int( tos );
       } else
-        pos = unwrap_int( tos );
-      var str = unwrap_string( s.pop() );
-      var cps = utf8_to_chars(str);
+        pos = H.unwrap_int( tos );
+      var str = H.unwrap_string( s.pop() );
+      var cps = H.utf8_to_chars(str);
 
       switch( sv ) {
         case SUB      :
-          s.push( StringSI( chars_to_utf8_string( cps.slice(pos))));
+          s.push( StringSI( H.chars_to_utf8_string( cps.slice(pos))));
         case SUBSTR   :
           // slice (pos, ?end);
           var end : Int;
@@ -730,7 +739,7 @@ class Builtins {
           else end = pos - len;
           // for slice pos(=start) always must be lesser then end
           if( pos > end ) {
-            swap_vars(pos, end);
+            H.swap_vars(pos, end);
             // correct negative indices after swapping
             // by moving them right >>
             // we need to do this because original indices before swapping
@@ -740,16 +749,16 @@ class Builtins {
             // so we move them both right
             if( pos < 0 ) { pos++; end++; }
           }
-          s.push( StringSI( chars_to_utf8_string( cps.slice(pos, end))));
+          s.push( StringSI( H.chars_to_utf8_string( cps.slice(pos, end))));
         case SUBRANGE :
           // here len is actually end
           var end = len;
           if( pos < 0 ) pos = 0;
           if( end < 0 ) end = 0;
           if( pos > end )
-            swap_vars(pos, end);
+            H.swap_vars(pos, end);
           s.push( StringSI(
-                chars_to_utf8_string( cps.slice(pos, end))));
+                H.chars_to_utf8_string( cps.slice(pos, end))));
       }
 
       return Noop;
@@ -757,14 +766,14 @@ class Builtins {
   }
 
   public static function string_to_string(s: Stack): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     var item = s.pop();
     s.push( StringSI( item.toString() ) );
     return Noop;
   }
 
   public static function subtract(s: Stack): StackItem {
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     var r = math_subtract(s);
     switch( r ) {
       case Noop : return Noop;
@@ -775,7 +784,7 @@ class Builtins {
   }
 
   public static function swap(s: Stack): StackItem {
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     s.swap();
     return Noop;
   }
@@ -787,12 +796,12 @@ class Builtins {
   }
 
   public static function temp_stack_pop(s: Stack): StackItem {
-    assert_has_one(s.tmp);
+    H.assert_has_one(s.tmp);
     s.push( s.tmp.pop() );
     return Noop;
   }
   public static function temp_stack_push(s: Stack): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     s.tmp.push( s.pop() );
     return Noop;
   }
@@ -802,21 +811,21 @@ class Builtins {
   }
 
   public static function times_loop(s: Stack, interp: Interpreter): StackItem {
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     var n = s.pop();
     var body = s.pop();
-    assert_is(n, "!Int");
-    assert_is(body, "!Quote");
-    for( i in 0 ... unwrap_int(n) ) {
+    H.assert_is(n, "!Int");
+    H.assert_is(body, "!Quote");
+    for( i in 0 ... H.unwrap_int(n) ) {
       // var eval_r = interp.eval_item(body, Eager);
-      var eval_r = interp.eval(unwrap_quote(body), Eager);
+      var eval_r = interp.eval(H.unwrap_quote(body), Eager);
       if( eval_r == Break ) break;
     }
     return Noop;
   }
 
   public static function type(s: Stack): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     var item = s.pop();
     s.push( StringSI( item.type() ) );
     return Noop;
@@ -824,8 +833,8 @@ class Builtins {
 
   // U-
   public static function unquote_to_values(s: Stack): StackItem {
-    assert_has_one(s);
-    var q = unwrap_quote( s.pop() );
+    H.assert_has_one(s);
+    var q = H.unwrap_quote( s.pop() );
     for( i in q )
       s.push( i );
     return Noop;
@@ -833,10 +842,10 @@ class Builtins {
 
   public static function unshift_to_quote(s: Stack): StackItem {
     // V [Q] >q
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     var qt = s.pop(); // need to pop into variable here
     var v = s.pop();
-    var q = unwrap_quote(qt);
+    var q = H.unwrap_quote(qt);
     q.unshift(v);
     s.push(QuoteSI(q));
     return Noop;
@@ -844,32 +853,32 @@ class Builtins {
 
   // W-
   public static function when_conditional(s: Stack, interp: Interpreter): StackItem {
-    assert_stack_has(s, 2);
+    H.assert_stack_has(s, 2);
     var then_br = s.pop();
     var cond = s.pop();
-    assert_is(then_br, "!Quote");
+    H.assert_is(then_br, "!Quote");
     interp.eval_item(cond, Eager);
     var r = s.pop(); // supposedly from evaluation of `cond`
     switch( r ) {
       case IntSI(i) :
         if( i != 0 ) interp.eval_item(then_br, Eager);
       case _        :
-        throw error('Condition for WHEN should leave !Int value on the stack. Found ${r.type()}');
+        throw H.error('Condition for WHEN should leave !Int value on the stack. Found ${r.type()}');
     }
     return Noop;
   }
 
   public static function while_loop(s: Stack, interp: Interpreter): StackItem {
-    assert_has_one(s);
+    H.assert_has_one(s);
     var body = s.pop();
-    assert_is(body, "!Quote");
+    H.assert_is(body, "!Quote");
     do {
       var eval_r = interp.eval_item(body, Eager);
       if( eval_r == Break ) break;
       var r = s.pop();
       switch( r ) {
         case IntSI(i) : if( i == 0 ) break;
-        case _        : throw error(
+        case _        : throw H.error(
            'Condition for WHILE should leave !Int value on the stack. Found ${r.type()}');
       }
     } while(true);
@@ -926,58 +935,6 @@ class Builtins {
     Sys.println(v);
   }
 
-  static function assert_has_one(s: Stack) {
-    if( s.is_empty() )
-      throw KonekoException.StackUnderflow;
-  }
-
-  static inline function error(s: String): KonekoException {
-    return KonekoException.Custom(s);
-  }
-
-  static function assert_stack_has(s: Stack, n: Int) {
-    if( n < 0 )
-      throw KonekoException.WrongAssertionParam;
-    if( s.length < n )
-      throw KonekoException.StackUnderflow;
-  }
-
-  static inline function assert_is(si: StackItem, type: String) {
-    if( si.type() != type )
-      throw KonekoException.AssertFailureWrongType(si.type(), type);
-  }
-
-  static inline function assert_is_number(si: StackItem) {
-    if( si.type() != "!Int" && si.type() != "!Float" )
-      throw error('Expected number, but found ${si.type()}');
-  }
-
-  static inline function assert_one_of(si: StackItem, types: Array<String>) {
-    var type = si.type();
-    for( t in types )
-      if( t == type ) return;
-    throw KonekoException.AssertFailureWrongType(si.type(), types.join(" | "));
-  }
-
-  static function assert_valid_utf8(s: String) {
-    if( !haxe.Utf8.validate(s) )
-      throw error("Not a valid UTF-8 string");
-  }
-
-  static inline function _3rd(s: Stack): StackCell {
-    return s.head.next.next;
-  }
-
-  // 0-based
-  static function nth(s: Stack, n: Int): StackCell {
-    assert_stack_has(s, n+1);
-    var cell = s.head;
-    while( n-- > 0 ) {
-      cell = cell.next;
-    } 
-    return cell;
-  }
-
 
   static function math_add(s: Stack): StackItem {
     var tos = s.pop();
@@ -987,22 +944,22 @@ class Builtins {
 
     // Both Int
     if( tos_type == "!Int" && nos_type == "!Int" ) {
-      var fst = unwrap_int( tos );
-      var snd = unwrap_int( nos );
+      var fst = H.unwrap_int( tos );
+      var snd = H.unwrap_int( nos );
       return add_int_int(fst, snd);
     }
 
     // One or both are Float
     if( tos_type == "!Float" || nos_type == "!Float" ) {
-      var fst = unwrap_float( tos );
-      var snd = unwrap_float( nos );
+      var fst = H.unwrap_float( tos );
+      var snd = H.unwrap_float( nos );
       return add_float_float(fst, snd);
     }
 
     // Both strings
     if( tos_type == "!String" && nos_type == "!String" ) {
-      var fst = unwrap_string( tos );
-      var snd = unwrap_string( nos );
+      var fst = H.unwrap_string( tos );
+      var snd = H.unwrap_string( nos );
       return add_strings(snd, fst); // it's more logical concat NOS + TOS
                                     // as they are added this way
     }
@@ -1017,14 +974,14 @@ class Builtins {
 
     // Both Int
     if( tos.type() == "!Int" && nos.type() == "!Int" ) {
-      var fst = unwrap_int( tos );
-      var snd = unwrap_int( nos );
+      var fst = H.unwrap_int( tos );
+      var snd = H.unwrap_int( nos );
       return subtract_int_int(snd, fst); // TOS from NOS
     }
 
     // Try to get floats
-    var fst = unwrap_float( tos );
-    var snd = unwrap_float( nos );
+    var fst = H.unwrap_float( tos );
+    var snd = H.unwrap_float( nos );
     return subtract_float_float(snd, fst); // TOS from NOS
 
     return Noop; // should be unreachable
@@ -1036,14 +993,14 @@ class Builtins {
 
     // Both Int
     if( tos.type() == "!Int" && nos.type() == "!Int" ) {
-      var fst = unwrap_int( tos );
-      var snd = unwrap_int( nos );
+      var fst = H.unwrap_int( tos );
+      var snd = H.unwrap_int( nos );
       return multiply_int_int(snd, fst);
     }
 
     // Try to get floats
-    var fst = unwrap_float( tos );
-    var snd = unwrap_float( nos );
+    var fst = H.unwrap_float( tos );
+    var snd = H.unwrap_float( nos );
     return multiply_float_float(snd, fst);
 
     return Noop; // should be unreachable
@@ -1089,51 +1046,6 @@ class Builtins {
       s.pop();
   }
 
-  static inline function unwrap_int(si: StackItem): Int {
-    return switch( si ) {
-      case IntSI(i): i;
-      case _ : throw error('Expected !Int, but found ${si.type()}');
-    }
-  }
-
-  static inline function unwrap_float(si: StackItem): Float {
-    return switch( si ) {
-      case IntSI(i)  : cast(i, Float);
-      case FloatSI(f): f;
-      case _ : throw error('Expected either !Int or !Float, but found ${si.type()}');
-    }
-  }
-
-  static inline function unwrap_bool(si: StackItem): Bool {
-    var r = switch( si ) {
-      case IntSI(i)  : cast(i, Float);
-      case FloatSI(f): f;
-      case _ : throw error('Expected either !Int or !Float as boolean, but found ${si.type()}');
-    }
-    return r != 0; // false for 0, true for everything else
-  }
-
-  static inline function unwrap_string(si: StackItem): String {
-    return switch( si ) {
-      case StringSI(s): s;
-      case _ : throw error('Expected !String, but found ${si.type()}');
-    }
-  }
-
-  static inline function unwrap_quote(si: StackItem): Array<StackItem> {
-    return switch( si ) {
-      case QuoteSI(q) : q;
-      case _          : throw error('Expected !Quote, but found ${si.type()}');
-    }
-  }
-
-  static inline function unwrap_atom(si: StackItem): String {
-    return switch( si ) {
-      case AtomSI(s)  : s;
-      case _          : throw error('Expected !Quote, but found ${si.type()}');
-    }
-  }
-
   macro static function do_compare(a: Expr, b: Expr, op: Expr): Expr {
     return macro switch( $op ) {
       case EQ  : $a == $b;
@@ -1153,63 +1065,5 @@ class Builtins {
       case NOT: !a;
     }
     return IntSI( r == true ? -1 : 0 );
-  }
-
-  static function char_to_utf8_string(char: Int): String {
-    // TODO
-    var u = new haxe.Utf8();
-    u.addChar(char);
-    return u.toString();
-  }
-
-  static function utf8_to_chars(str: String): Array<Int> {
-    var cps = new Array<Int>();
-    for( i in 0 ... haxe.Utf8.length(str) )
-      cps.push( haxe.Utf8.charCodeAt(str, i) );
-    return cps;
-  }
-
-  static function chars_to_utf8_string(chars: Array<Int>): String {
-    // TODO
-    var u = new haxe.Utf8();
-    for ( i in chars )
-      u.addChar(i);
-    return u.toString();
-  }
-
-  static function valid_for_uppercase(c: Int): Bool {
-    // 65-90, 97-122 ascii, 1040-1071, 1072-1103, 1025+1105(80 diff)
-    return (c >= 97 && c <= 122) || // ascii lower
-      (c >= 1072 && c <= 1103);     // utf-8 cyrillic lower
-  }
-
-  static function valid_for_lowercase(c: Int): Bool {
-    // 65-90, 97-122 ascii, 1040-1071, 1072-1103, 1025+1105(80 diff)
-    return (c >= 65 && c <= 90) || // ascii upper
-      (c >= 1040 && c <= 1071);     // utf-8 cyrillic upper
-  }
-
-  /**
-    Converts functions of type `Stack -> Vocabulary -> StackItem`
-    to `Stack -> StackItem`
-   **/
-  public static function with_voc(voc: Vocabulary, func: Stack -> Vocabulary -> StackItem) {
-    return function(s: Stack): StackItem {
-      return func(s, voc);
-    }
-  }
-
-  public static function with_interp(interp: Interpreter, func: Stack -> Interpreter  -> StackItem) {
-    return function(s: Stack): StackItem {
-      return func(s, interp);
-    }
-  }
-
-  macro static function swap_vars(a: Expr, b: Expr): Expr {
-    return macro {
-      var tmp = $a;
-      $a = $b;
-      $b = tmp;
-    }
   }
 }

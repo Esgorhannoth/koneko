@@ -123,13 +123,17 @@ class Vocabulary {
     return this;
   }
 
-  // alias
+  // alias for set
   public inline function add(key: String, value: StackItem): Vocabulary {
     return this.set(key, value);
   }
 
+  public inline function add_to_namespace(key: String, value: StackItem, ns: String): Vocabulary {
+    voc.set('${ns}:${key}', value);
+    return this;
+  }
   public inline function add_builtin(key: String, value: StackItem): Vocabulary {
-    voc.set("Builtin:" + key, value);
+    this.add_to_namespace(key, value, "Builtin");
     return this;
   }
 

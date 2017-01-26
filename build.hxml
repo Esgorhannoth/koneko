@@ -26,6 +26,12 @@
 # -neko bin/inter.n
 #
 # Test Main
+
+-cp src
+koneko.FileSystemMod
+-neko fs.n
+
+--next
 -cp src
 -main koneko.Main
 -neko bin/koneko.n

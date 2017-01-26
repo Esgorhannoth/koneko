@@ -1,5 +1,7 @@
 package koneko;
 
+import koneko.Helpers as H;
+
 enum EvalMode {
   Lazy;
   Eager;
@@ -198,7 +200,7 @@ class Interpreter {
 
 
     // Quotes
-    add_builtin("i",             Builtins.with_interp(this, Builtins.identity));
+    add_builtin("i",             H.with_interp(this, Builtins.identity));
     add_builtin("quote",         Builtins.quote_values);
     add_builtin("unquote",       Builtins.unquote_to_values);
     add_builtin("q<",            Builtins.push_to_quote);
@@ -209,33 +211,33 @@ class Interpreter {
     add_builtin("concat",        Builtins.concat_quotes);
 
     // looping and branching
-    add_builtin("if",            Builtins.with_interp(this, Builtins.if_conditional));
-    add_builtin("when",          Builtins.with_interp(this, Builtins.when_conditional));
-    add_builtin("while",         Builtins.with_interp(this, Builtins.while_loop));
-    add_builtin("times",         Builtins.with_interp(this, Builtins.times_loop));
+    add_builtin("if",            H.with_interp(this, Builtins.if_conditional));
+    add_builtin("when",          H.with_interp(this, Builtins.when_conditional));
+    add_builtin("while",         H.with_interp(this, Builtins.while_loop));
+    add_builtin("times",         H.with_interp(this, Builtins.times_loop));
 
     // Definitions
     add_builtin(":",             Builtins.define);
     add_builtin("is!",           Builtins.define);
     add_builtin("is",            Builtins.careful_define);
-    add_builtin("def?",          Builtins.with_voc(vocabulary, Builtins.define_check_word));
-    add_builtin("undef",         Builtins.with_voc(vocabulary, Builtins.define_undefine));
-    add_builtin("see",           Builtins.with_voc(vocabulary, Builtins.define_see_source));
+    add_builtin("def?",          H.with_voc(vocabulary, Builtins.define_check_word));
+    add_builtin("undef",         H.with_voc(vocabulary, Builtins.define_undefine));
+    add_builtin("see",           H.with_voc(vocabulary, Builtins.define_see_source));
 
     add_builtin("break",         Builtins.break_loop);
 
     // Utils
-    add_builtin("all-words",     Builtins.with_voc(vocabulary, Builtins.words_list));
+    add_builtin("all-words",     H.with_voc(vocabulary, Builtins.words_list));
     add_builtin("type?",         Builtins.type);
 
     // namespace
-    add_builtin("ns",            Builtins.with_voc(vocabulary, Builtins.namespace_set));
-    add_builtin("ns?",           Builtins.with_voc(vocabulary, Builtins.namespace_get));
-    add_builtin("ns-def?",       Builtins.with_voc(vocabulary, Builtins.namespace_check_defined));
-    add_builtin("ns-words",      Builtins.with_voc(vocabulary, Builtins.namespace_words_list));
-    add_builtin("words",         Builtins.with_voc(vocabulary, Builtins.namespace_cur_words));
-    add_builtin("using",         Builtins.with_voc(vocabulary, Builtins.namespace_using));
-    add_builtin("active-nss",    Builtins.with_voc(vocabulary, Builtins.namespace_active_nss));
+    add_builtin("ns",            H.with_voc(vocabulary, Builtins.namespace_set));
+    add_builtin("ns?",           H.with_voc(vocabulary, Builtins.namespace_get));
+    add_builtin("ns-def?",       H.with_voc(vocabulary, Builtins.namespace_check_defined));
+    add_builtin("ns-words",      H.with_voc(vocabulary, Builtins.namespace_words_list));
+    add_builtin("words",         H.with_voc(vocabulary, Builtins.namespace_cur_words));
+    add_builtin("using",         H.with_voc(vocabulary, Builtins.namespace_using));
+    add_builtin("active-nss",    H.with_voc(vocabulary, Builtins.namespace_active_nss));
 
     // Exiting
     add_builtin("quit/with",     Builtins.quit_with);
@@ -246,6 +248,9 @@ class Interpreter {
     add_builtin("read-line",     Builtins.read_line_stdin);
     add_builtin("print",         Builtins.print);
     add_builtin("sleep",         Builtins.sleep);
+
+    // Modules
+    add_builtin("load",          H.with_voc(vocabulary, Builtins.load_module));
   }
 
   inline function add_builtin(key: String, builtin: Stack->StackItem) {
