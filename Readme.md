@@ -14,7 +14,7 @@ To build Koneko just run in shell:
 ```bash
 $ cd somewhere-you-remember
 $ git clone https://github.com/Esgorhannoth/koneko
-# cd koneko
+$ cd koneko
 $ haxe build.hxml
 ```
 
