@@ -1,6 +1,6 @@
 # Koneko
 
-Koneko is a toy project I started to understand how lexer and parser work. I'm sure I've made a lot of mistakes anyway. Also I like [NekoVM](http://nekovm.org) and I thought it would be good to have another language beside [Haxe](http://haxe.org/) that runs on NekoVM :)
+Koneko is a toy project I started to understand how lexer and parser work. I'm sure I've made a lot of mistakes anyway. Also I like [NekoVM](http://nekovm.org) and I thought it would be good to have another language beside [Haxe](http://haxe.org/) that runs on NekoVM :3
 
 The language itself is a wild mix of ideas from Forth, Factor, Joy and my own preferences. It is stack-based, imperative, interpreted programming (scripting?) language with Reverse Polish Notation.
 
