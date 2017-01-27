@@ -17,7 +17,8 @@ class KonekoMod {
   {
     // add them to the map manually :-/
     var words = new Voc();
-    words.set("exists", exists);
+    words.set("exists?", exists);
+    words.set("exist?", exists);
     // 0.o seems that without calling .keys() this method is not created at all
     words.keys();
     return words;

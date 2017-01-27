@@ -207,6 +207,7 @@ class Interpreter {
     add_builtin(">q",            Builtins.unshift_to_quote);
     add_builtin("<q",            Builtins.shift_from_quote);
     add_builtin("q>",            Builtins.pop_from_quote);
+    add_builtin("ql",            Builtins.quote_length);
     add_builtin("reverse",       Builtins.reverse_quote);
     add_builtin("concat",        Builtins.concat_quotes);
 

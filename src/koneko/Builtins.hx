@@ -154,10 +154,11 @@ class Builtins {
       case ErrSI     (e) : throw H.error(e);
       case BreakSI       : s.push(item); // or throw?
 
-      case AtomSI    (s) : throw H.error('How did atom ${s} get here? 0.o');
+      case AtomSI    (s) : interp.eval_item(item);
+      // case AtomSI    (s) : throw H.error('How did atom ${s} get here? 0.o');
       case DefAtomSI     : throw H.error('How did defatom get here? 0.o');
       case MaybeDefSI    : throw H.error('How did maybedef get here? 0.o');
-      case BuiltinSI (_) : throw H.error('How did builting get here? 0.o');
+      case BuiltinSI (_) : throw H.error('How did builtin get here? 0.o');
       case Noop          : // do nothing
       case PartQuoteSI(_): // should not meet at all
     } // switch
@@ -506,10 +507,16 @@ class Builtins {
     return Noop;
   }
 
+  public static function quote_length(s: Stack): StackItem {
+    H.assert_has_one(s);
+    var q = H.unwrap_quote( s.pop() );
+    s.push( IntSI( q.length ) );
+    return Noop;
+  }
+
   public static function quote_values(s: Stack): StackItem {
-    var item = s.pop();
-    H.assert_is(item, "!Int");
-    var n = H.unwrap_int(item);
+    H.assert_has_one(s);
+    var n = H.unwrap_int( s.pop() );
     H.assert_stack_has(s, n);
     var a = new Array<StackItem>();
     for( i in 0 ... n )

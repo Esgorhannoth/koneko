@@ -86,7 +86,7 @@ x stack item has it's type as string for generic isOf(type: String) function
 
 - combinators?
 * [v] `i` identity
-* [ ] `each`: `[el el] [func] each`
+* [v] `each`: `[el el] [func] each` :: in Prelude.kn
 
 * [v] assert : `break`s on false on stack
 * [v] S assert-type : `break`s on wrong type
@@ -128,9 +128,13 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [v] ... and cannot be redefined (??)
 
 |17.0126.1254|
-* [ ] modules - static functions Stack->StackItem that export words and can be `load`ed
-* [ ] `load`
+* [v] modules - static functions Stack->StackItem that export words and can be `load`ed
+* [v] `load`
 * [v] concat
+
+|17.0127.0502|
+* [v] Q ql - quote length
+* [ ] BUG? single quote in comment counts as string start (e.g. `can't`)
 
 
 

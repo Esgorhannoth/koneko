@@ -14,6 +14,15 @@
 [0] is false
 [swap not swap when] is unless
 
+[dup assert-quote over assert-quote ( assertions )
+>t               ( save "function" )
+dup ql           ( get quote length )
+>t               ( and save it for `times` )
+reverse unquote  ( fill stack with values )
+<t <t swap times ( get length, function swap em and do `len` times ) ]
+is
+each
+
 [over over] is 2dup
 [drop drop] is 2drop
 [rot >t rot <t] is 2swap
