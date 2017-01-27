@@ -84,7 +84,7 @@ BatmanandRobin > <CR>
 ```
 
 <a name="quotations">
-## Qutations
+## Quotations
 </a>
 
 Sometimes we need not evaluate a word right now. We can put the word (or several words) on stack in "quotes".
