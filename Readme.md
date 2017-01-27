@@ -1,6 +1,6 @@
 # Koneko
 
-Koneko is a toy project I started to understand how lexer and parser works. I'm sure I've made a lot of mistakes anyway. Also I like [NekoVM](http://nekovm.org) and I thought it would be good to have another language beside [Haxe](http://haxe.org/) that runs on NekoVM :)
+Koneko is a toy project I started to understand how lexer and parser work. I'm sure I've made a lot of mistakes anyway. Also I like [NekoVM](http://nekovm.org) and I thought it would be good to have another language beside [Haxe](http://haxe.org/) that runs on NekoVM :)
 
 The language itself is a wild mix of ideas from Forth, Factor, Joy and my own preferences. It is stack-based, imperative, interpreted programming (scripting?) language with Reverse Polish Notation.
 
@@ -84,10 +84,10 @@ BatmanandRobin > <CR>
 ```
 
 <a name="quotations">
-## Qutation
+## Qutations
 </a>
 
-Sometimes we need not to evaluate a word right now. We can put the word (or several words) on stack in "quotes".
+Sometimes we need not evaluate a word right now. We can put the word (or several words) on stack in "quotes".
 ```forth
 > "Wild Wild Guest" say
 Wild Wild Guest
@@ -134,13 +134,13 @@ Some words are just so good that we want to use them over and over. Like `open`.
 
 There are two namespaces that you'll have no matter what: _Builtin_ and _Main_. Builtin has all the words that are defined and written in Haxe. You cannot redefined words in Builtin namespace, but you can shadow them. Main is namespace created by the interpreter for you to define your own words and generally play around.
 
-If you have a file named *Prelude.kn* in your current working directory, Koneko will load and interpret the contents of this file and add defintions from it to predefined Prelude namespace. You can put there word definitions that you need the most or just find useful.
+If you have a file named *Prelude.kn* in your current working directory, Koneko will load and interpret the contents of this file and add defintions from it to predefined _Prelude_ namespace. You can put there word definitions that you need the most or just find useful.
 
 We'll see how to work with namespaces when we learn some new words.
 
 
 <a name="words">
-## All the words so far
+## All the words in the world are not enough
 </a>
 
 This section is quite long and contains the list of predefined words and a short explanation for each of them. Where appropriate stack effect comments will show up.
@@ -156,7 +156,9 @@ Legend:
 * TOS - Top Of Stack
 * NOS - Next On Stack
 
+<a name="words-stack">
 ### Stack
+</a>
 
 * `dup ( 1 -- 1 1 )` - duplicates TOS
 * `swap ( 1 2 --  2 1 )` - swaps two topmost stack items.
@@ -174,14 +176,19 @@ Legend:
 * `2swap ( 1 2 3 4 -- 3 4 1 2 )` - swaps two pairs of values
 * `2over ( 1 2 3 4 -- 1 2 3 4 1 2 )` - like `over`, but for a pair of values
 
+<a name="words-temp-stack">
 ### Temporary stack
+</a>
 
 * `>t` - transfer value from main stack to temporary stack
 * `<t` - transfer value from temporary stack to main stack
 * `.t` - show contents of temporary stack
 * `.tl` - puts number of items in temporary stack on top of main stack
 
+
+<a name="words-temp-stack">
 ### Math
+</a>
 
 * `+` - adds two numbers or two strings
 * `-` - subtracts TOS from NOS
@@ -197,7 +204,9 @@ Legend:
 * `random ( i -- i )` - puts on stack a random Integer between zero and TOS (including, excluding) or `[0...x)`
 * `rnd` - puts on stack a random Float number between 0 including and 1 excluding 
 
+<a name="words-strings">
 ## Strings
+</a>
 
 * `at ( s i -- s )` - returns character at position `i`
 * `uc ( s -- s )` - converts string to uppercase (ASCII and utf-8 cyrillic only for now)
@@ -210,14 +219,18 @@ Legend:
 * `string-length ( s -- i )` - returns length of string `s`
 * `len? ( s -- i )` - alias for `string-length` in Prelude
 
+<a name="words-chars">
 ### Chars (as Integers)
+</a>
 
 * `atc ( s i -- i )` - returns codepoint ('c' in 'atc') at position `i` in string `s` 
 * `chr->str ( i -- s )` - converts char (int) to utf8 string
 * `chars->str ( q(i) -- s )` - converts list (quote) of chars to utf8 string
 * `emit ( i -- )` - print character
 
+<a name="words-definitions">
 ### Definitions
+</a>
 
 * `:`, `is!` - define new word, e.g. [ some words in quote ] : new-word
 * `is` - careful definition, won't define word if it is already defined
@@ -225,7 +238,9 @@ Legend:
 * `see ( q(a+) -- )` - prints source code of words in quote, e.g. [ say len? ] see
 * `undef ( q(a+) )` - undefines (erases from vocabulary) atoms listed in quote, e.g. [ say ] undef
 
+<a name="words-quotations">
 ### Quotations
+</a>
 
 `>q`, `q<`, `<q`, `q>` - are kind of mnemonics: push to start of quote, push to end of quote, get from start of quote, get from end of quote
 
@@ -239,7 +254,9 @@ Legend:
 * `concat ( q q -- q )` - concatenates two quotes, e.g. [ 1 2 ] [ 3 4 ] -> [ 1 2 3 4 ]
 * `i ( v -- ? )` - evaluates value on TOS ( useful for quotes and atoms , everything else evaluatess to itself )
 
+<a name="words-loops-branches">
 ### Loops and branches
+</a>
 
 * `if` - conditional evaluation: `bool [then branch] [else branch] if`
 * `when` - like `if` without `else-branch`: `bool [then branch] when`
@@ -247,7 +264,9 @@ Legend:
 * `while ( q -- ??)` - repeats words in quote while TOS equals boolean `true`, i.e. the last instruction in quote must put or modify boolean value on TOS which is then consumed by`while`
 * `break` - stops evaluation of current quote (e.g. inside a `while` loop). On top level inside a file stops evaluation of file, on top level in interpreter stops evaluation of words behind `break`
 
+<a name="words-namespaces">
 ### Namespaces
+</a>
 
 * `ns ( s -- )` - switches current namespace to `s`
 * `ns? ( -- s )` - puts current namespace on TOS
@@ -258,25 +277,35 @@ Legend:
 * `acitve-nss` - prints active namespaces
 * `all-words` - prints all words in all namespaces
 
+<a name="words-quitting">
 ### (Rage)Quitting
+</a>
 
 * `bye` - exits interpreter or finishes evaluation of a file
 * `quit/with ( i -- )` - quits with `i` error code
 
+<a name="words-real-world">
 ### Connections to real world
+</a>
 
 * `args` - puts on stack a quote with command line args (as strings)
 * `read-line` - reads user input and places it on TOS
 * `print ( v -- )` - prints the value of TOS
 * `sleep ( i -- )` - holds execution for `i` number of seconds
 
+<a name="words-modules">
 ### Modules
+</a>
 * `load ( s -- )` - loads neko bytecode-compiled file '`s`.n' and adds words in it into vocabulary
 
+<a name="words-misc">
 ### Miscellaneous
+</a>
 *  `type? ( 1 -- s )` - puts on stack string representation of TOS value. Types start with "!" like "!String"
 
 
+<a name="koneko-use">
 ## Koneko and how to use it
+</a>
 
 To be continued.
