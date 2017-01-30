@@ -11,6 +11,20 @@ class Helpers {
     return KonekoException.Custom(s);
   }
 
+  // side-effect: `i` is updated after evaluation
+  public static function load_file(fn: String, i: Interpreter) {
+    if( sys.FileSystem.exists(fn) ) {
+      try {
+        var body = sys.io.File.getContent(fn);
+        i.interpret(body);
+      }
+      catch(e: Dynamic)
+        throw error('Could not get contents of file: ${fn}');
+    }
+    else
+      throw error('Could not find file: ${fn}');
+  }
+
   // 0-based
   public static function nth(s: Stack, n: Int): StackCell {
     assert_stack_has(s, n+1);

@@ -183,6 +183,29 @@ class Builtins {
     return Noop;
   }
 
+  public static function import_file(s: Stack, interp: Interpreter): StackItem {
+    H.assert_has_one(s);
+    var item = s.pop();
+    if( "!String" == item.type() ) {
+      var fn = H.unwrap_string(item);
+      H.load_file(fn, interp);
+    }
+    else {
+      var q = H.unwrap_quote(item);
+      for( i in q ) {
+        try {
+          var fn = H.unwrap_string(i);
+          H.load_file(fn, interp);
+        }
+        catch(e: Dynamic) {
+          say(e);
+          continue;
+        }
+      }
+    }
+    return Noop;
+  }
+
   // L-
   public static function load_module(s: Stack, voc: Vocabulary): StackItem {
     H.assert_has_one(s);

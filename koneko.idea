@@ -137,8 +137,9 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [ ] BUG? single quote in comment counts as string start (e.g. `can't`)
 
 |17.0130.0911|
-* [ ] import(?) - interpret file in place
-* [ ] Q(S+) system - execute system command
+* [v] import(?) - interpret file in place
+* [x] Q(S+) system - execute system command
+* [ ] sys module with most of functions from haxe Sys package
 
 
 

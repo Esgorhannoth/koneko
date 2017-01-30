@@ -249,6 +249,7 @@ class Interpreter {
     add_builtin("read-line",     Builtins.read_line_stdin);
     add_builtin("print",         Builtins.print);
     add_builtin("sleep",         Builtins.sleep);
+    add_builtin("import",        H.with_interp(this, Builtins.import_file));
 
     // Modules
     add_builtin("load",          H.with_voc(vocabulary, Builtins.load_module));
