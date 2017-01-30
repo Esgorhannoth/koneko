@@ -740,9 +740,9 @@ class Builtins {
           // slice (pos, ?end);
           var end : Int;
           if( len < 0 ) len = 0; // if len is 0 - we'll return empty string
-          // if pos > 0 we should add len to get end index
+          // if pos >= 0 we should add len to get end index
           // if pos < 0 we should subtract len from pos to get end index
-          if( pos > 0 ) end = pos + len;
+          if( pos >= 0 ) end = pos + len;
           else end = pos - len;
           // for slice pos(=start) always must be lesser then end
           if( pos > end ) {
