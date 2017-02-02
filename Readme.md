@@ -786,7 +786,112 @@ This loop will echo what user typed until user types `quit`. That last `true` is
 ### Space full of names
 </a>
 
-Work in progress.
+As you already know, namespaces allow us to use the same string of characters for different actual words. Every time you start Koneko, you have at least two namespaces.
+
+One, `Builtin`, is always available and you cannot remove or otherwise modify words in it. Words in `Builtin` namespace are actually written in Haxe.
+
+The other available namespace is called `Main` by default. It's the namespace you define new words in Koneko. You can create many more namespaces and are not bound to use this `Main` namespace.
+
+If you have a file named `Prelude.kn` in current working directory and have not instructed Koneko not to load it, it will be interpreted and words in it added to the interpreter in `Prelude` namespace.
+
+Now let's learn what else you can do with namespaces. First of all, we need to know what namespace we are in now. This is done with `ns?` word. It puts current namespace name on top of the stack:
+
+```forth
+> ns? .
+"Main" > _
+```
+
+To check if a namespace is defined at all, use `ns-def?` word:
+
+```forth
+> "Main" ns-def? .
+0 > 'Builtin' ns-def? .
+-1 > _
+```
+
+Here `Main` is undefined because we have not defined any words in it yet. Let's correct this:
+
+```forth
+> ns? .
+"Main" > [ '!!' + ] is louder
+> 'Now we have it' louder say
+Now we have it!!
+> 'Main' ns-def? .
+-1 > _
+```
+
+That's better. Now let's create our own namespace for the first time. Namespaces are created (or switched) with `ns` word, which expects a string on the stack:
+
+```forth
+> 'fst' ns
+> ns? .
+"fst" > 'fst' ns-def? .
+0 > [ '?' + ] is as-question
+> 'fst' ns-def? .
+-1 > _
+```
+
+To get a list of all words in current namespace use the word `words`. Use `ns-words` to get all words in any other namespace. It expects a string with namespace on top of the stack:
+
+```forth
+> (suppose we're still inside "fst" namespace) words
+<ns:fst>   as-question
+> 'Main' ns-words
+<ns:Main>   louder
+> _
+```
+
+There naturally arises a problem, that you can only use words that are in 'Builtin', 'Prelude' (if loaded) and current namespaces. Suppose we have a situation like this:
+
+```forth
+> ( words' implementation is not important here )
+> 'file' ns
+> [ name exists? create ] is new-file
+> 'io' ns
+> [ new-file copy-string] is write
+> 'string to write' 'filename' write
+No such word "new-file"
+```
+
+`new-file` is unreachable because while we are in `io` namespace, we have access only to `io`, `Prelude` and `Builtin` in this order. To use a word that is not in one of these namespaces, you must specify the namespace before the word with a colon:
+
+```forth
+> 'io' ns
+> [ file:new-file copy-string ] is! write
+```
+
+But it is bad for two reasons: it's cumbersome and it couples `io:write` with `file:new-file`, so we cannot hot-swap `new-file` definition from e.g. another module. Luckily you can specify several namespaces to be used simulaneously with word `using`. Like this:
+
+```forth
+> ['file' 'io'] using
+> 'file' ns [ name exists? create ] is new-file
+> 'io' ns [ new-file copy-string ] is write
+> 'string to write' 'filename' write
+> _
+```
+
+What happens here is that we make both `file` and `io` namespaces active, and when interpreter does not fine `new-file` in current namespace (`io`), it searches for it in other active namespaces, right to left. Also you can specify just one namespace for `using` if need be. In that case just use a string, not a quote:
+
+```forth
+> 'Main' using 'Main' ns ns? .
+"Main" > _
+```
+
+We switched to "Main" namespaces so that it's words are available after we stop using other namespaces.
+
+There's a handy word that shows which namespaces are active now - `active-nss`:
+
+```forth
+> 'io' ns ( current NS is 'io' )
+> ['file' 'io'] using
+> active-nss
+< using:  file  io >
+> 'Main' using active-nss ( using 'Main', but 'io' is still our current NS, so it's listed )
+< using:  Main io >
+> 'Main' ns active-nss
+< using:  Main >
+```
+
 
 [Back to top](#top)
 <a name="working-with-strings">
@@ -800,5 +905,91 @@ Work in progress.
 ### Modules. The Why and The How
 </a>
 
-Work in progress.
+Modules in Koneko allow adding functionality without recompiling the main interpreter. Under the hood a module is just a Haxe `.hx` file with a predefined class name `KonekoMod` and some static methods, that provide this additional functionality. The skeleton class looks like this:
+
+```haxe
+package koneko;
+
+
+import koneko.Helpers as H;
+import koneko.Typedefs;
+// other needed imports here
+
+// You are not bound to use koneko.Helpers, of course
+// Actually you do not even need to import Typedefs, because
+// the only thing used from the file is this typedef:
+
+// typedef Voc = Map<String, Stack->StackItem>;
+
+// But you'll still need Koneko sources for using other classes
+// like Stack or StackItem
+
+
+
+class KonekoMod {
+  // we do not need to do anything special on initialization
+  public function new() {}
+
+  // this field provides the namespace for the exported words
+  static var Namespace = "fs";
+
+  // this method is called when the module is loaded
+  // to actually get module's namespace
+  public inline function get_namespace() {
+    return Namespace;
+  }
+
+  // this method is called when the module is loaded
+  // to get new words from the module
+  public function get_words(): Voc // just for testing now
+  {
+    // create a new vocabulary (defined in Typedefs)
+    var words = new Voc();
+    // add words and corresponsing functions to it
+    // e.g.
+    words.set("exists?", exists);
+    words.set("exist?", exists);
+    // 0.o seems that without calling .keys() this method is not created in neko bytecode at all
+    // so just call it
+    words.keys();
+    return words;
+  }
+
+  // sample function
+  public static function exists(s:Stack): StackItem {
+    H.assert_has_one(s);
+    var name = H.unwrap_string( s.pop() );
+    if( FileSystem.exists(name) )
+      s.push( IntSI( -1 ) ); // true
+    else
+      s.push( IntSI( 0 ) );  // false
+    return Noop;
+  }
+}
+```
+
+
+All functions inside a module must accept Stack and return StackItem (most of the time just `Noop`)
+
+To build a Koneko module do not specify `-main` flag to haxe:
+
+```bash
+$ haxe koneko.ModFileName -neko <load-name>.n
+```
+
+Some clarification is needed I guess: **All** files with modules must have KonekoMod class, otherwise NekoVM loader won't find it. But you still can save it with different, meaningful name, like FileSystemMod.hx. This name (with koneko package) you give to `haxe` on the command line. `load-name` is the name that is used by `load`.
+
+E.g. you have a KonekoMod class, that works with sockets. You save it in file named 'SocketsMod.hx' and build it like this:
+
+```bash
+$ haxe koneko.SocketsMod -neko sockets.n
+```
+
+Then you `load` it in the interpreter:
+
+```forth
+> 'sockets' load
+> _
+```
+
 

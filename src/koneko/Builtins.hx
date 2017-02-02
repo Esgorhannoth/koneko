@@ -358,10 +358,12 @@ class Builtins {
   // N-
   public static function namespace_active_nss(s: Stack, voc: Vocabulary): StackItem {
     var nss = voc.using_list;
+    var cur = voc.current_ns;
     var sb = new StringBuf();
     sb.add("< using:");
     for( i in nss )
-      sb.add('  $i');
+      if( i != cur )
+        sb.add('  $i');
     sb.add("  ");
     sb.add(voc.current_ns);
     sb.add(" >");

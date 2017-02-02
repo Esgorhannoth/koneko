@@ -57,7 +57,9 @@ class Interpreter {
         }
         var si = vocabulary.get(s);
         switch( si ) {
-          case Noop : say('No such word "${s}"');
+          case Noop :
+            say('No such word "${s}"');
+            return Break;
           case _    : return eval_item(si, Eager);
         }
       case DefAtomSI     : 
