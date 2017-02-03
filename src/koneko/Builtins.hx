@@ -763,34 +763,65 @@ class Builtins {
           s.push( StringSI( H.chars_to_utf8_string( cps.slice(pos))));
         case SUBSTR   :
           // slice (pos, ?end);
-          var end : Int;
-          if( len < 0 ) len = 0; // if len is 0 - we'll return empty string
-          // if pos >= 0 we should add len to get end index
-          // if pos < 0 we should subtract len from pos to get end index
-          if( pos >= 0 ) end = pos + len;
-          else end = pos - len;
-          // for slice pos(=start) always must be lesser then end
-          if( pos > end ) {
-            H.swap_vars(pos, end);
-            // correct negative indices after swapping
-            // by moving them right >>
-            // we need to do this because original indices before swapping
-            // were [-pos, -end)
-            // After swapping they are [-end, -pos)
-            // That's not what we need, we need (-end, -pos]
-            // so we move them both right
-            if( pos < 0 ) { pos++; end++; }
+          var start: Int = 0;
+          var end  : Int = 0;
+          // +pos, +len - starting at `pos` take `len` chars right of `pos`
+          if( pos >= 0 && len >= 0 ) {
+            start = pos;
+            end = pos + len;
           }
-          s.push( StringSI( H.chars_to_utf8_string( cps.slice(pos, end))));
+          // +pos, -len - starting at `pos` take `len` chars left of `pos`
+          if( pos >= 0 && len < 0 ) {
+            start = pos + len; // `len` is negative so acually we subtract
+            if( start < 0 ) start = 0;
+            end = pos;
+          }
+          // -pos, +len - starting at `pos` from end take `len` chars right of `pos`
+          // [ (l + 1 - pos) as k , k + len )
+          if( pos < 0 && len >= 0 ) {
+            var l = cps.length;
+            // no `+1` needed here
+            var k = l + pos; // `pos` is negative so actually we subtract
+            start = k;
+            end = k + len;
+            if( start < 0 ) start = 0;
+            if( end < 0 ) end = 0;
+          }
+          // -pos, -len - starting at `pos` from end take `len` chars left of `pos`
+          // [ k + len , (l + 1 - pos) as k )
+          if( pos < 0 && len < 0 ) {
+            var l = cps.length;
+            // `+1` coz it is used as end index, which would be dropped
+            // if not for this +1
+            var k = l + 1 + pos; // `pos` is negative so actually we subtract
+            start = k + len;     // `len` is negative so actually we subtract
+            end = k;
+            if( start < 0 ) start = 0;
+            if( end < 0 ) end = 0;
+          }
+          s.push( StringSI( H.chars_to_utf8_string( cps.slice(start, end))));
         case SUBRANGE :
-          // here len is actually end
-          var end = len;
-          if( pos < 0 ) pos = 0;
-          if( end < 0 ) end = 0;
-          if( pos > end )
-            H.swap_vars(pos, end);
+          // here `len` is actually end index
+          var start = pos;
+          var end   = len + 1;
+          var l = cps.length;
+          // calc actual indices
+          if( pos < 0 ) {
+            var k = l + pos; // `pos` is negative so actually we subtract
+            start = k;
+          }
+          if( len < 0 ) {
+            var k = l + len; // `len` is negative so actually we subtract
+            end = k + 1;
+          }
+          if( start >= end ) {
+            H.swap_vars( start, end );
+            // necessary corrections, coz start is included and end is not
+            start--;
+            end++;
+          }
           s.push( StringSI(
-                H.chars_to_utf8_string( cps.slice(pos, end))));
+                H.chars_to_utf8_string( cps.slice(start, end))));
       }
 
       return Noop;

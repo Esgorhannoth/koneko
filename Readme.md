@@ -262,8 +262,8 @@ Legend:
 * `backw ( s --  s )` - reverses string
 * `to-str ( s -- s )` - converts TOS to string
 * `sub ( s i -- s )` - substring of string from position `i`
-* `substr ( s i1 i2 -- s )` - substring of string `s` from position `i1`  with length `i2`
-* `subrange (s i1 i2 -- s)` - substring of string `s` from position `i1` (including) to position `i2` (excluding)
+* `substr ( s i1 i2 -- s )` - substring of string `s` from position `i1` with length `i2`
+* `subrange (s i1 i2 -- s)` - substring of string `s` from position `i1` to position `i2` (both included)
 * `string-length ( s -- i )` - returns length of string `s`
 * `len? ( s -- i )` - alias for `string-length` in Prelude
 
@@ -898,7 +898,109 @@ There's a handy word that shows which namespaces are active now - `active-nss`:
 ### Char + Char = String?
 </a>
 
-Work in progress.
+Strings in Koneko use UTF-8 encoding. All words that use indices, index by codepoints, not individual bytes. String length show the number of visible glyphs too.
+
+Core language supports quite a few words for working with strings. We'll start with `string-length` that has `Prelude` alias `len?`:
+
+```forth
+> 'I never asked for this' len? say
+22
+> "Параграф'78" len? say ( eight cyrillic glyphs, an apostrophe, two digits, total eleven glyphs )
+11
+> _
+```
+
+You can switch letter case with `uc` for upper case and `lc` for lower case. Currently it works only for *ASCII* (codepoints 65-90, 97-122) and *cyrillic* (codepoints 1025, 1040-1103, 1105) subsets of UTF-8:
+
+```forth
+> "big brown bear" uc say
+BIG BROWN BEAR
+> 'SMALL WORLD' lc say
+small world
+> "Нет судьбы кроме той, что мы творим сами" uc say ( there is no fate but what we make for ourselves )
+НЕТ СУДЬБЫ КРОМЕ ТОЙ, ЧТО МЫ ТВОРИМ САМИ
+```
+
+If you need to loop through a string in reverse order, you can reverse a string with `backw`. Not a great name, I know.
+
+```forth
+> "idnalrednoW ni ecilA" backw say
+Alice in Wonderland
+> "седуч енартс в асилА" backw say
+Алиса в стране чудес
+```
+
+You san `print` or `say` any value on the stack, but if you ever need a string representation of the value, you can use `to-str` word:
+
+```forth
+> [ 1 2 3 ] say
+<Quote>
+> [ 1 2 3 ] to-str say
+[1 2 3]
+```
+
+To get a glyph at specific position in the string, use `at`. It expects a string and an integer on the stack. Indexing is 0-based:
+
+```forth
+> "Nothing is true" 3 at say
+h
+> "Шоколад" 0 at say
+Ш
+> "four" 5 at say
+ERROR: Index out of bounds
+```
+
+There are three words to work with substrings: `sub`, `substr` and `subrange`. `sub` is the easiest to use, it just expects a string and a starting index (0-based) on the stack:
+
+```forth
+> "don't do it!" 6 sub say
+do it!
+```
+
+You can think of the index as the number of symbols to drop from the start of the string.
+
+`substr` is like `sub`, but it also expects the number of letters to take. If this number is greater than the length of the whole string, `substr` will work like `sub`, i.e. just return the letters from the starting position specified.
+
+```forth
+> 'four' 1 2 substr say
+ou
+> 'four' 1 23 substr say
+our
+```
+
+Both index and length can be negative. For index it means that indexing is done from the end (-1 being the last letter), for length it means leftwards direction. Some examples are due;
+
+```forth
+> '123456789' 1 negate 1 substr say
+9
+> '123456789' 2 negate 1 substr say
+8
+> '123456789' 2 negate 2 substr say
+89
+> '123456789' 2 negate 2 negate substr say
+78
+> '123456789' 2 negate 4 negate substr say
+5678
+```
+
+`subrange`, as the name implies, takes a string, a starting position index and an ending position index (both included). One or both indices can be negative. In that case the negative index is calculated from the end of the string (-1 being the last letter of the string). If starting index is greater than ending index, they are swapped.
+
+```forth
+> '123456789' 0 0 subrange say
+1
+> '123456789' 0 3 subrange say
+1234
+> '123456789' 1 0 subrange say
+12
+> '123456789' 3 0 subrange say
+1234
+> '123456789' 1 negate 0 subrange say
+123456789
+> '123456789' 1 negate 4 subrange say
+56789
+> '123456789' 2 negate 4 negate subrange say
+678
+```
 
 [Back to top](#top)
 <a name="working-with-modules">
