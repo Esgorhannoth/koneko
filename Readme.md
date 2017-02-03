@@ -274,6 +274,7 @@ Legend:
 
 * `atc ( s i -- i )` - returns codepoint ('c' in 'atc') at position `i` in string `s` 
 * `chr->str ( i -- s )` - converts char (int) to utf8 string
+* `str->chars ( s -- q(i) )` - converts utf8 string to list (quote) of chars (ints)
 * `chars->str ( q(i) -- s )` - converts list (quote) of chars to utf8 string
 * `emit ( i -- )` - print character
 
@@ -1000,6 +1001,24 @@ Both index and length can be negative. For index it means that indexing is done 
 56789
 > '123456789' 2 negate 4 negate subrange say
 678
+```
+
+Koneko allows working with individual characters as integer codepoints.
+
+`atc` allows to get codepoint at specified index (0-based). `chr->str` converts integer codepoint on top of the stack to UTF-8 glyph. `chars->str` converts a list (quote) of integer codepoints to UTF-8 string and `str->chars` does it in reverse. `emit` prints integer codepoint as UTF-8 character.
+
+```forth
+> "Машина" 2 atc say
+1096
+> emit
+ш> _
+> "Машина" str->chars dup dup .
+[1052 1072 1096 1080 1085 1072] > _
+> [emit] each
+Машина> _
+> chars->str say
+Машина
+> _
 ```
 
 [Back to top](#top)

@@ -737,6 +737,19 @@ class Builtins {
     return Noop;
   }
 
+  public static function string_string_to_chars(s: Stack): StackItem {
+    var str = H.unwrap_string( s.pop() );
+    var len = haxe.Utf8.length(str);
+    var i = 0;
+    var q = new Array<StackItem>();
+    while( i < len ) {
+      q.push( IntSI( haxe.Utf8.charCodeAt(str, i) ));
+      i++;
+    }
+    s.push( QuoteSI(q) );
+    return Noop;
+  }
+
   public static function string_substring_common(sv: SubstrVariant): Stack->StackItem {
     return function(s: Stack): StackItem {
       var pos: Int;

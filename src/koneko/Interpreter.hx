@@ -171,6 +171,7 @@ class Interpreter {
     add_builtin("emit",          Builtins.string_emit);
     add_builtin("chr->str",      Builtins.string_char_to_string);
     add_builtin("chars->str",    Builtins.string_chars_to_string);
+    add_builtin("str->chars",    Builtins.string_string_to_chars);
 
 
     // Math

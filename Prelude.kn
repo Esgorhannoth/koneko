@@ -33,7 +33,7 @@ each
 [ 2 / ] is 2/
 
 ( from to -- [from .. to] )
-[ >t 0 quote swap [ dup >t q< <t 1 + ] <t times drop ]
+[ over - 1 + >t 0 quote swap [ dup >t q< <t 1 + ] <t times drop ]
 is range
 
 "Main" ns
