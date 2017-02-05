@@ -6,7 +6,7 @@ Koneko is a toy project I started to understand how lexer and parser work. I'm s
 
 The language itself is a wild mix of ideas from Forth, Factor, Joy and my own preferences. It is stack-based, imperative, interpreted programming (scripting?) language with Reverse Polish Notation.
 
-The word "koneko" means "kitten" in japanese. :)
+The word "koneko" means "kitten" in Japanese. :)
 
 ## Table of contents
 
@@ -177,7 +177,7 @@ Some words are just so good that we want to use them over and over. Like `open`.
 
 There are two namespaces that you'll have no matter what: _Builtin_ and _Main_. Builtin has all the words that are defined and written in Haxe. You cannot redefined words in Builtin namespace, but you can shadow them. Main is namespace created by the interpreter for you to define your own words and generally play around.
 
-If you have a file named *Prelude.kn* in your current working directory, Koneko will load and interpret the contents of this file and add defintions from it to predefined _Prelude_ namespace. You can put there word definitions that you need the most or just find useful.
+If you have a file named *Prelude.kn* in your current working directory, Koneko will load and interpret the contents of this file and add definitions from it to predefined _Prelude_ namespace. You can put there word definitions that you need the most or just find useful.
 
 We'll see how to work with namespaces when we learn some new words.
 
@@ -257,8 +257,8 @@ Legend:
 </a>
 
 * `at ( s i -- s )` - returns character at position `i`
-* `uc ( s -- s )` - converts string to uppercase (ASCII and utf-8 cyrillic only for now)
-* `lc ( s -- s )` - converts string to lowercase (ASCII and utf-8 cyrillic only for now)
+* `uc ( s -- s )` - converts string to uppercase (ASCII and utf-8 Cyrillic only for now)
+* `lc ( s -- s )` - converts string to lowercase (ASCII and utf-8 Cyrillic only for now)
 * `backw ( s --  s )` - reverses string
 * `to-str ( s -- s )` - converts TOS to string
 * `sub ( s i -- s )` - substring of string from position `i`
@@ -304,7 +304,7 @@ Legend:
 * `q> ( q -- q i )` - pop value from back of quote
 * `reverse ( q -- q )` - reverses values in quote, e.g. [ 1 2 3 ] -> [ 3 2 1 ]
 * `concat ( q q -- q )` - concatenates two quotes, e.g. [ 1 2 ] [ 3 4 ] -> [ 1 2 3 4 ]
-* `i ( v -- ? )` - evaluates value on TOS ( useful for quotes and atoms , everything else evaluatess to itself )
+* `i ( v -- ? )` - evaluates value on TOS ( useful for quotes and atoms , everything else evaluates to itself )
 
 [Back to top](#top)
 <a name="words-loops-branches">
@@ -329,7 +329,7 @@ Legend:
 * `ns-words ( s --  )` - prints all words that namespace `s` has
 * `words` - prints words in current namespace
 * `using ( q(s+) )` - makes listed namespaces "active", so that you do not have to type namespace before word
-* `acitve-nss` - prints active namespaces
+* `active-nss` - prints active namespaces
 * `all-words` - prints all words in all namespaces
 
 [Back to top](#top)
@@ -384,7 +384,7 @@ If you start Koneko with no args whatsoever, it will launch REPL (Read-Eval-Prin
 
 If you provide filename(s), then they will be interpreted in order. **But be warned**, that they will be interpreted by the same interpreter, so words defined in the first file will be available in the second etc.
 
-Actually these to invokations are equal:
+Actually these two invocations are equal:
 ```bash
 $ koneko file1.kn file2.kn test.kn
 $ koneko -f file1.kn --load file2.kn -f test.kn
@@ -399,7 +399,7 @@ Otherwise these flags are available:
 
 All flags preload `Prelude.kn` file from current working directory, if present. You can specify `-n` flag to prevent this.
 
-Several `-e` phrases will be evaluated in the same interpreter, so you can defin a word in one `-e` block and it will be available in the following `-e` blocks.
+Several `-e` phrases will be evaluated in the same interpreter, so you can define a word in one `-e` block and it will be available in the following `-e` blocks.
 
 ```bash
 $ koneko -e '["*" print] is star ["\n" print] is nl' -f some-other-file.kn -e '[star] 5 times nl'
@@ -554,7 +554,7 @@ There are just a few words that work with it. `>t` to move top of the main stack
 ### Math in Koneko
 </a>
 
-Math in Koneko is just like math in every other language, in Reverse Polish Notaion. Nothing to see here. Move along.
+Math in Koneko is just like math in every other language, in Reverse Polish Notation. Nothing to see here. Move along.
 
 ```forth
 > 24 42 + say
@@ -737,7 +737,7 @@ Busy stack!
 > _
 ```
 
-Here we first check if `.sl` (stack length) is greater then 4 (which leaves boolean value of eigher -1 for `true`, or 0 for `false`), then we put the quote to evaluate `when` condition is `true`, and then call the word `when` itself.
+Here we first check if `.sl` (stack length) is greater then 4 (which leaves boolean value of either -1 for `true`, or 0 for `false`), then we put the quote to evaluate `when` condition is `true`, and then call the word `when` itself.
 
 `if` is similar to `when`, but has an *else* branch: `<cond -1|0> [then-branch] [else-branch] if`.
 
@@ -757,7 +757,7 @@ Koneko has these basic looping words with some more in supplied *Prelude.kn* fil
 > [ "They're taking the hobbits to Isengard!" say ] 10000 times
 ```
 
-`while` word expexts a quote on top of the stack, which it evaluates `while` the value on the stack after evaluation is `true` (non-zero). So the phrase itself must be conserned with exiting the loop.Also `while` can be used to create infinite loops with exit on `break`:
+`while` word expects a quote on top of the stack, which it evaluates `while` the value on the stack after evaluation is `true` (non-zero). So the phrase itself must be concerned with exiting the loop.Also `while` can be used to create infinite loops with exit on `break`:
 
 ```forth
 > [ read-line dup 'quit' = [break] when say true ] while
@@ -861,7 +861,7 @@ No such word "new-file"
 > [ file:new-file copy-string ] is! write
 ```
 
-But it is bad for two reasons: it's cumbersome and it couples `io:write` with `file:new-file`, so we cannot hot-swap `new-file` definition from e.g. another module. Luckily you can specify several namespaces to be used simulaneously with word `using`. Like this:
+But it is bad for two reasons: it's cumbersome and it couples `io:write` with `file:new-file`, so we cannot hot-swap `new-file` definition from e.g. another module. Luckily you can specify several namespaces to be used simultaneously with word `using`. Like this:
 
 ```forth
 > ['file' 'io'] using
@@ -906,12 +906,12 @@ Core language supports quite a few words for working with strings. We'll start w
 ```forth
 > 'I never asked for this' len? say
 22
-> "Параграф'78" len? say ( eight cyrillic glyphs, an apostrophe, two digits, total eleven glyphs )
+> "Параграф'78" len? say ( eight Cyrillic glyphs, an apostrophe, two digits, total eleven glyphs )
 11
 > _
 ```
 
-You can switch letter case with `uc` for upper case and `lc` for lower case. Currently it works only for *ASCII* (codepoints 65-90, 97-122) and *cyrillic* (codepoints 1025, 1040-1103, 1105) subsets of UTF-8:
+You can switch letter case with `uc` for upper case and `lc` for lower case. Currently it works only for *ASCII* (codepoints 65-90, 97-122) and *Cyrillic* (codepoints 1025, 1040-1103, 1105) subsets of UTF-8:
 
 ```forth
 > "big brown bear" uc say
@@ -1066,7 +1066,7 @@ class KonekoMod {
   {
     // create a new vocabulary (defined in Typedefs)
     var words = new Voc();
-    // add words and corresponsing functions to it
+    // add words and corresponding functions to it
     // e.g.
     words.set("exists?", exists);
     words.set("exist?", exists);
