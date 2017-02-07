@@ -29,7 +29,7 @@
 
 -cp src
 koneko.FileSystemMod
--neko fs.n
+-neko bin/fs.n
 
 --next
 -cp src

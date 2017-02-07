@@ -422,7 +422,7 @@ class Builtins {
   public static function namespace_words_list(s: Stack, voc: Vocabulary): StackItem {
     H.assert_has_one(s);
     var ns = H.unwrap_string( s.pop() );
-    var ns_len = ns.length + 1; // eat ":"
+    var ns_len = ns.length + 1; // eat delim
 
     var words = new Array<String>();
     for (i in voc.keys()) {
@@ -436,6 +436,43 @@ class Builtins {
     });
     out('<ns:${ns}>   ');
     say(words.join("  "));
+    return Noop;
+  }
+
+  public static function namespace_words_list_all(s: Stack, voc: Vocabulary): StackItem {
+    var words = new Array<String>();
+    for (i in voc.keys()) {
+      words.push(i);
+    }
+    words.sort(function(s1: String, s2: String): Int {
+      if( s1 == s2 ) return 0;
+      else if( s1 > s2 ) return 1;
+      else return -1;
+    });
+
+    // say(words.join(" "));
+    var delim = voc.get_delim();
+    var cur_ns = delim;
+    var ns_len = 0;
+    var fst_line = true;
+    var sb = new StringBuf();
+    for( w in words ) {
+      // update namespace
+      if( !w.startsWith(cur_ns) ) {
+        var i = w.indexOf(delim) + 1;
+        cur_ns = w.substring(0, i);
+        ns_len = i;
+        if( fst_line )
+          fst_line = false;
+        else
+          sb.add("\n\n");
+        sb.add(cur_ns);
+        sb.add("\n=-=-=-=-=\n");
+      }
+      sb.add("  ");
+      sb.add(w.substr(ns_len));
+    } // for words
+    say(sb.toString());
     return Noop;
   }
 
@@ -958,42 +995,6 @@ class Builtins {
            'Condition for WHILE should leave !Int value on the stack. Found ${r.type()}');
       }
     } while(true);
-    return Noop;
-  }
-
-  public static function words_list(s: Stack, voc: Vocabulary): StackItem {
-    var words = new Array<String>();
-    for (i in voc.keys()) {
-      words.push(i);
-    }
-    words.sort(function(s1: String, s2: String): Int {
-      if( s1 == s2 ) return 0;
-      else if( s1 > s2 ) return 1;
-      else return -1;
-    });
-
-    // say(words.join(" "));
-    var cur_ns = ":";
-    var ns_len = 0;
-    var fst_line = true;
-    var sb = new StringBuf();
-    for( w in words ) {
-      // update namespace
-      if( !w.startsWith(cur_ns) ) {
-        var i = w.indexOf(":") + 1;
-        cur_ns = w.substring(0, i);
-        ns_len = i;
-        if( fst_line )
-          fst_line = false;
-        else
-          sb.add("\n\n");
-        sb.add(cur_ns);
-        sb.add("\n=-=-=-=-=\n");
-      }
-      sb.add("  ");
-      sb.add(w.substr(ns_len));
-    } // for words
-    say(sb.toString());
     return Noop;
   }
 

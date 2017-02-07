@@ -13,12 +13,15 @@ class KonekoMod {
   public inline function get_namespace() {
     return Namespace;
   }
+
   public function get_words(): Voc // just for testing now
   {
     // add them to the map manually :-/
     var words = new Voc();
     words.set("exists?", exists);
     words.set("exist?", exists);
+    words.set("full-path", full_path);
+    words.set("mkdir", create_directory);
     // 0.o seems that without calling .keys() this method is not created at all
     words.keys();
     return words;
@@ -31,6 +34,20 @@ class KonekoMod {
       s.push( IntSI( -1 ) ); // true
     else
       s.push( IntSI( 0 ) );  // false
+    return Noop;
+  }
+
+  public static function full_path(s:Stack): StackItem {
+    H.assert_has_one(s);
+    var rel_path = H.unwrap_string( s.pop() );
+    s.push( StringSI( FileSystem.fullPath(rel_path) ));
+    return Noop;
+  }
+
+  public static function create_directory(s:Stack): StackItem {
+    H.assert_has_one(s);
+    var rel_path = H.unwrap_string( s.pop() );
+    FileSystem.createDirectory(rel_path);
     return Noop;
   }
 }

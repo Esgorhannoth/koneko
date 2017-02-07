@@ -231,7 +231,6 @@ class Interpreter {
     add_builtin("break",         Builtins.break_loop);
 
     // Utils
-    add_builtin("all-words",     H.with_voc(vocabulary, Builtins.words_list));
     add_builtin("type?",         Builtins.type);
 
     // namespace
@@ -240,6 +239,7 @@ class Interpreter {
     add_builtin("ns-def?",       H.with_voc(vocabulary, Builtins.namespace_check_defined));
     add_builtin("ns-words",      H.with_voc(vocabulary, Builtins.namespace_words_list));
     add_builtin("words",         H.with_voc(vocabulary, Builtins.namespace_cur_words));
+    add_builtin("all-words",     H.with_voc(vocabulary, Builtins.namespace_words_list_all));
     add_builtin("using",         H.with_voc(vocabulary, Builtins.namespace_using));
     add_builtin("active-nss",    H.with_voc(vocabulary, Builtins.namespace_active_nss));
 

@@ -26,6 +26,8 @@ class Vocabulary {
 
   var voc: Map<String, StackItem>;
 
+  static var ns_delim = "/";  // namespace delimiter
+
   static var builtin_ns  = "Builtin";
 
   var        prelude_ns  : String;
@@ -73,14 +75,14 @@ class Vocabulary {
   function find_ns(key: String): String {
     // full name
     if( this.voc.exists(key) ) {
-      var idx = key.indexOf(":");
+      var idx = key.indexOf(ns_delim);
       return key.substr(idx);
     }
 
     if( this.voc.exists(in_current(key) ))   // in current NS
       return current_ns;
     for( ns in this.using_list )
-      if( this.voc.exists('${ns}:${key}') )
+      if( this.voc.exists('${ns}${ns_delim}${key}') )
         return ns;
 
     if( this.voc.exists(in_prelude(key) ))   // in Prelude
@@ -101,7 +103,7 @@ class Vocabulary {
   public function get(key: String, ?given_ns: String): StackItem {
     // just get it
     if( given_ns != null )
-      return voc.get('${given_ns}:${key}');
+      return voc.get('${given_ns}${ns_delim}${key}');
 
     // no such atom
     var ns = this.find_ns(key);
@@ -112,7 +114,7 @@ class Vocabulary {
     if( this.voc.exists(key) )
       return voc.get(key);
 
-    return voc.get('${ns}:${key}');
+    return voc.get('${ns}${ns_delim}${key}');
     return Noop; // unreachable
   }
 
@@ -129,7 +131,7 @@ class Vocabulary {
   }
 
   public inline function add_to_namespace(key: String, value: StackItem, ns: String): Vocabulary {
-    voc.set('${ns}:${key}', value);
+    voc.set('${ns}${ns_delim}${key}', value);
     return this;
   }
   public inline function add_builtin(key: String, value: StackItem): Vocabulary {
@@ -152,7 +154,7 @@ class Vocabulary {
 
     if( ns == builtin_ns )
       throw "Cannot remove Builtin word";
-    voc.remove('${ns}:${key}');
+    voc.remove('${ns}${ns_delim}${key}');
 
     return this;
   }
@@ -178,15 +180,19 @@ class Vocabulary {
   }
 
   public inline function in_current(key: String): String {
-    return current_ns + ":" + key;
+    return current_ns + ns_delim + key;
   }
 
   public inline function in_prelude(key: String): String {
-    return prelude_ns + ":" + key;
+    return prelude_ns + ns_delim + key;
   }
 
   public inline function in_builtins(key: String): String {
-    return builtin_ns + ":" + key;
+    return builtin_ns + ns_delim + key;
+  }
+
+  public inline function get_delim(): String {
+    return ns_delim;
   }
 
 
