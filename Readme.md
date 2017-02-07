@@ -95,7 +95,7 @@ Hello,世界
 ```
 By the way, Koneko is *case-sensitive*.
 
-The only rule is that a word cannot contain parentheses, braces or brackets ( No '()', '[]', '{}' ). Also it is not advisable to include colons in words, because it can mess with [Namespace](#namespaces) recognition.
+The only rule is that a word cannot contain parentheses, braces or brackets ( No '()', '[]', '{}' ). Also it is not advisable (but possible) to include namespace delimiter in words, because it can mess with [Namespace](#namespaces) recognition.
 
 
 
@@ -854,14 +854,14 @@ There naturally arises a problem, that you can only use words that are in 'Built
 No such word "new-file"
 ```
 
-`new-file` is unreachable because while we are in `io` namespace, we have access only to `io`, `Prelude` and `Builtin` in this order. To use a word that is not in one of these namespaces, you must specify the namespace before the word with a colon:
+`new-file` is unreachable because while we are in `io` namespace, we have access only to `io`, `Prelude` and `Builtin` in this order. To use a word that is not in one of these namespaces, you must specify the namespace before the word with a namespace delimiter ('/'):
 
 ```forth
 > 'io' ns
-> [ file:new-file copy-string ] is! write
+> [ file/new-file copy-string ] is! write
 ```
 
-But it is bad for two reasons: it's cumbersome and it couples `io:write` with `file:new-file`, so we cannot hot-swap `new-file` definition from e.g. another module. Luckily you can specify several namespaces to be used simultaneously with word `using`. Like this:
+But it is bad for two reasons: it's cumbersome and it couples `io/write` with `file/new-file`, so we cannot hot-swap `new-file` definition from e.g. another module. Luckily you can specify several namespaces to be used simultaneously with word `using`. Like this:
 
 ```forth
 > ['file' 'io'] using

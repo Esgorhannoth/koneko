@@ -98,6 +98,13 @@ class Interpreter {
     var mode = ( how == null ) ? Lazy : how;
     for( el in ast ) {
       mode = eval_item(el, mode);
+      /*
+      try {
+        mode = eval_item(el, mode);
+      }
+      catch(e:Dynamic)
+        handleErrors(e);
+        */
       if( mode == Break )
         break;
     }
@@ -127,8 +134,10 @@ class Interpreter {
         case AlreadyDefined(s)   : 'Word $s is already defined';
       });
     }
-    else
+    else {
+      out("ERROR: ");
       say(e);
+    }
   }
 
   function init_builtins() {

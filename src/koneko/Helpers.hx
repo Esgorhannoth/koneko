@@ -114,6 +114,39 @@ class Helpers {
     }
   }
 
+
+
+  public static inline function push_bool(s:Stack, val:Bool) {
+    if( val )
+      s.push( IntSI( -1 ));
+    else
+      s.push( IntSI( 0 ));
+  }
+
+  public static inline function push_string(s: Stack, val:String) {
+    s.push( StringSI(val) );
+  }
+
+  // ??
+  public static inline function push_string_quote(s:Stack, val:Array<String>) {
+    var arr = new Array<StackItem>();
+    for( i in val )
+      arr.push( StringSI(i) );
+    s.push( QuoteSI(arr) );
+  }
+
+
+
+
+  //
+  // Array
+  //
+
+
+
+  //
+  // Chars
+  //
   public static function char_to_utf8_string(char: Int): String {
     // TODO
     var u = new haxe.Utf8();
@@ -147,6 +180,9 @@ class Helpers {
     return (c >= 65 && c <= 90) || // ascii upper
       (c >= 1040 && c <= 1071);     // utf-8 cyrillic upper
   }
+
+
+
 
   /**
     Converts functions of type `Stack -> Vocabulary -> StackItem`

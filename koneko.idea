@@ -94,8 +94,6 @@ x stack item has it's type as string for generic isOf(type: String) function
 
 * [v] .sl, .tl - stack length and temp stack length
 
-* [ ] BigInt much later
-
 
 |17.0116.1546|
 * [v] Vocabulary: change to Map<String, StackItem>
@@ -141,8 +139,13 @@ x stack item has it's type as string for generic isOf(type: String) function
 * [x] Q(S+) system - execute system command
 * [ ] sys module with most of functions from haxe Sys package
 
+|17.0207.1402|
+* [ ] better error handling ?
 
 
+
+|much later|
+* [ ] BigInt
 
 
 
