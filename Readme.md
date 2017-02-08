@@ -346,8 +346,9 @@ Legend:
 </a>
 
 * `args` - puts on stack a quote with command line args (as strings)
-* `read-line` - reads user input and places it on TOS
+* `cmd` ( s/q(s) -- i ) - executes a command with OS' command shell and returns errorcode (0 for success). Argument is either a String, typed exactly as in command line, or a list of strings, first being command to execute and the rest being its arguments (that will be quoted as expected by shell)
 * `print ( v -- )` - prints the value of TOS
+* `read-line` - reads user input and places it on TOS
 * `sleep ( i -- )` - holds execution for `i` number of seconds
 * `import ( s -- )` - loads `.kn` file and evaluates it
 

@@ -76,6 +76,28 @@ class Builtins {
     return Noop;
   }
 
+  public static function command(s: Stack): StackItem {
+    H.assert_has_one(s);
+    var item = s.pop();
+    switch( item ) {
+      case StringSI(cmd) :
+        var r = Sys.command(cmd);
+        H.push_int(s, r);
+      case QuoteSI(q)  :
+        var args = new Array<String>();
+        for( i in q ) {
+          var val = H.unwrap_string_or(i, null);
+          if( val != null) args.push(val);
+        }
+        var cmd = args.shift();
+        var r = Sys.command( cmd, args );
+        H.push_int(s, r);
+      case _           :
+        throw H.error('!String or !Quote expected, but ${item.type()} found');
+    }
+    return Noop;
+  }
+
   public static function concat_quotes(s: Stack): StackItem {
     H.assert_stack_has(s, 2);
     var item = s.pop();

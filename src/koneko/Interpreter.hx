@@ -258,8 +258,9 @@ class Interpreter {
 
     // Outer unverse
     add_builtin("args",          Builtins.args_from_cli);
-    add_builtin("read-line",     Builtins.read_line_stdin);
+    add_builtin("cmd",           Builtins.command);
     add_builtin("print",         Builtins.print);
+    add_builtin("read-line",     Builtins.read_line_stdin);
     add_builtin("sleep",         Builtins.sleep);
     add_builtin("import",        H.with_interp(this, Builtins.import_file));
 

@@ -100,6 +100,13 @@ class Helpers {
     }
   }
 
+  public static inline function unwrap_string_or(si: StackItem, val: String): String {
+    return switch( si ) {
+      case StringSI(s): s;
+      case _          : val;
+    }
+  }
+
   public static inline function unwrap_quote(si: StackItem): Array<StackItem> {
     return switch( si ) {
       case QuoteSI(q) : q;
@@ -125,6 +132,10 @@ class Helpers {
 
   public static inline function push_string(s: Stack, val:String) {
     s.push( StringSI(val) );
+  }
+
+  public static inline function push_int(s: Stack, val:Int) {
+    s.push( IntSI(val) );
   }
 
   // ??
