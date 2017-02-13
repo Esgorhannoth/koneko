@@ -171,7 +171,8 @@ class Builtins {
     H.assert_has_one(s);
     var item: StackItem = s.pop();
     switch( item ) {
-      case QuoteSI   (q) : interp.eval(q, Eager);
+      case QuoteSI   (q) : interp.eval(q);
+      // case QuoteSI   (q) : interp.eval(q, Eager);
       case IntSI     (_) | FloatSI(_) | StringSI(_) : s.push(item);
       case ErrSI     (e) : throw H.error(e);
       case BreakSI       : s.push(item); // or throw?

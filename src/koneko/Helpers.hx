@@ -138,6 +138,10 @@ class Helpers {
     s.push( IntSI(val) );
   }
 
+  public static inline function push_float(s: Stack, val:Float) {
+    s.push( FloatSI(val) );
+  }
+
   // ??
   public static inline function push_string_quote(s:Stack, val:Array<String>) {
     var arr = new Array<StackItem>();

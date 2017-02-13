@@ -28,10 +28,5 @@
 # Test Main
 
 -cp src
-koneko.FileSystemMod
--neko bin/fs.n
-
---next
--cp src
 -main koneko.Main
 -neko bin/koneko.n
