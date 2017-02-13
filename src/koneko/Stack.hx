@@ -1,5 +1,7 @@
 package koneko;
 
+using koneko.StackItem;
+
 interface IStack {
   public function tos(): StackItem; // Top Of Stack
   public function nos(): StackItem; // Next On Stack
@@ -61,7 +63,7 @@ class Stack implements IStack {
   {
     if( length <= 0 )
       throw KonekoException.StackUnderflow;
-    head = new StackCell(head.value, head);
+    head = new StackCell(head.value.deepCopy(), head);
     length++;
     return this;
   }

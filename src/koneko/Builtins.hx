@@ -161,7 +161,7 @@ class Builtins {
     return s.pop();
   }
 
-  public static function dup(s: Stack): StackItem {
+  public inline static function dup(s: Stack): StackItem {
     s.dup();
     return Noop;
   }

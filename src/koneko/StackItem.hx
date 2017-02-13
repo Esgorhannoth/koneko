@@ -61,4 +61,16 @@ class StackItems {
       case _             : "<Unknown>";
     }
   }
+
+  public static function deepCopy(si: StackItem): StackItem {
+    return switch( si ) {
+      case QuoteSI(q) :
+        var ar = new Array<StackItem>();
+        for( i in q ) {
+          ar.push( i.deepCopy() );
+        }
+        QuoteSI(ar);
+      case _          : si;
+    }
+  }
 }
