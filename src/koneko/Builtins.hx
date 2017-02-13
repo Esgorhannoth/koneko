@@ -260,7 +260,7 @@ class Builtins {
         r = do_compare(H.unwrap_float(left), H.unwrap_float(right), op);
       }
       if( r == true )
-        s.push( IntSI(1) );
+        s.push( IntSI(-1) );
       else
         s.push( IntSI(0) );
 
