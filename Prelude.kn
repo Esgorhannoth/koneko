@@ -36,4 +36,8 @@ each
 [ over - 1 + >t 0 quote swap [ dup >t q< <t 1 + ] <t times drop ]
 is range
 
+( n m M - number, min {ge}, Max {lt} )
+[ rot dup -rot ( m n M n  ) swap ( n M )< -rot swap ( n m )>= and [true] [false] if  ]
+is within
+
 "Main" ns
