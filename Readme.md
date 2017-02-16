@@ -8,6 +8,9 @@ The language itself is a wild mix of ideas from Forth, Factor, Joy and my own pr
 
 The word "koneko" means "kitten" in Japanese. :)
 
+## Current status
+I (almost) do not work on it anymore. As it turned out I did fail with some concepts :) Koneko works, but it does not feel comfortable to work with. So I will leave it "as is" and try to put more thought into it next time. *Fit fabricando faber*.
+
 ## Table of contents
 
 * [Building](#building)
