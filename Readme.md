@@ -157,7 +157,7 @@ There are words that create and modify quotes. They even can be used for simple 
 ## Word definitions
 </a>
 
-You can create new words with one of three words: `:`, `is`, and `is!`. `:` and `is` are actually equivalent - they (re)define a word no matter what. `is` is more careful, it won't redefine a word if it is already defined.
+You can create new words with one of three words: `:`, `is`, and `is!`. `:` and `is!` are actually equivalent - they (re)define a word no matter what. `is` is more careful, it won't redefine a word if it is already defined.
 
 ```forth
 > [print '\n' print] is say
