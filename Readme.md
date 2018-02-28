@@ -544,7 +544,7 @@ Now no one will ever find it.
 ### Temporary stack
 </a>
 
-Temporary stack plays part of the role *return stack* plays in Forth. Sometimes Forth programmers use return stack to hold temporary values, while the mess with the main stack (data stack). Because Koneko words quite differently with words, return stack is not needed for "returning" but the idea of holding some values temporarily somewhere convenient is too good to pass. So here it is - temporary stack.
+Temporary stack plays part of the role *return stack* plays in Forth. Sometimes Forth programmers use return stack to hold temporary values, while the mess with the main stack (data stack). Because Koneko works quite differently with words, return stack is not needed for "returning" but the idea of holding some values temporarily somewhere convenient is too good to pass. So here it is - temporary stack.
 
 There are just a few words that work with it. `>t` to move top of the main stack to the temporary stack, `<t` to move it back, `.t` to print contents of the temporary stack (debugging) and `.tl` to put number of items in the temporary stack on top of the main stack. There is no word to clear drop or clear this stack, but if you ever need them, they are easily defined:
 
